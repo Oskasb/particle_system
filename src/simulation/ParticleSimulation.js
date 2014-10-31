@@ -27,6 +27,8 @@ define([
 
 	ParticleSimulation.prototype.notifyDied = function(particle) {
 
+		this.particles.splice(this.particles.indexOf(particle), 1);
+
 		for (var i = 0; i < this.renderers.length; i++) {
 			this.renderers[i].died(particle)
 		}

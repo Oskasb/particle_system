@@ -55,6 +55,7 @@ function (
 		this.settings = settings;
 		this.meshPositions = [];
 		this.simulations = [];
+		this.removeSims = [];
 	/*
 	// move to behaviour logic...
 		var entity = goo.world.by.name(settings.follow.value).first();
@@ -90,7 +91,6 @@ function (
 
 		this.aliveParticles = 0;
 
-
 		this.setup = settings.setup;
 		this.spawner = createSpawner(settings.simulator_config.spawner.value);
 
@@ -107,26 +107,11 @@ function (
 			this.initRenderer(rendererName);
 		}
 
-		if (this.setup) {
-			this.setup(this);
-		}
-
-		this.alphaFunction = settings.alphaFunction || function (particle) {
-			var step = 1;
-			if (!settings.skipFade.value) {
-				if (particle.lifeSpan < particle.lifeSpanTotal * 0.5) {
-					step = MathUtils.smoothstep(0, particle.lifeSpanTotal * 0.25, particle.lifeSpan);
-				} else {
-					step = 1 - MathUtils.smoothstep(particle.lifeSpanTotal * 0.6, particle.lifeSpanTotal, particle.lifeSpan);
-				}
-			}
-			particle.alpha = particle.color.data[3] * step;
-		};
-
 		this.visible = true;
-
 		this.calcVec = new Vector3();
 	}
+
+
 
 	ParticleSimulator.prototype.addEffectSimulation = function(position, normal, effectData) {
 		var sim = new ParticleSimulation(new Vector3(position), new Vector3(normal), this.settings.simulation_params, effectData);
@@ -134,6 +119,8 @@ function (
 		for (var i = 0; i < this.renderers.length; i++) {
 			sim.registerParticleRenderer(this.renderers[i]);
 		}
+
+		this.includeSimulation(sim);
 
 		this.simulations.push(sim)
 	};
@@ -221,10 +208,50 @@ function (
 	};
 
 
+	ParticleSimulator.prototype.includeSimulation = function(sim) {
+		var count = sim.count;
+
+		for (var i = 0, l = this.particles.length; i < l && count > 0; i++) {
+			var particle = this.particles[i];
+			if (particle.dead) {
+
+				var ratio = 1 - particle.stretch * (sim.count-count) / sim.count;
+
+				particle.position.x = sim.position.x + sim.normal.x*ratio;
+				particle.position.y = sim.position.y + sim.normal.y*ratio;
+				particle.position.z = sim.position.z + sim.normal.z*ratio;
+
+				particle.acceleration = sim.acceleration;
+				particle.gravity = sim.gravity;
+				particle.alphaCurve = sim.alphaCurve;
+				particle.growthCurve = sim.growthCurve;
+
+				particle.lifeSpanTotal = particle.lifeSpan = randomBetween(sim.lifeSpan[0], sim.lifeSpan[1]);
+
+				particle.frameOffset = count/sim.effectCount;
+
+				particle.velocity.x = sim.strength*((Math.random() -0.5) * (2*sim.spread) + (1-sim.spread)*sim.normal.x);
+				particle.velocity.y = sim.strength*((Math.random() -0.5) * (2*sim.spread) + (1-sim.spread)*sim.normal.y);
+				particle.velocity.z = sim.strength*((Math.random() -0.5) * (2*sim.spread) + (1-sim.spread)*sim.normal.z);
+
+				particle.dead = false;
+				this.aliveParticles++;
+				particle.gravity = sim.gravity;
+				particle.opacity = sim.opacity;
+
+				count--;
+
+				sim.particles.push(particle);
+
+			}
+		}
+	};
+
+	ParticleSimulator.prototype.removeSimulation = function(sim) {
+		this.simulations.splice(this.simulations.indexOf(sim, 1));
+	};
+
 	ParticleSimulator.prototype.updateSimulation = function (sim, tpf) {
-
-
-		var acc = 1 - tpf * (sim.params.acceleration || 1);
 
 		var i, j, l;
 		for (i = 0, l = sim.particles.length; i < l; i++) {
@@ -234,9 +261,16 @@ function (
 				continue;
 			}
 
-			particle.lifeSpan += tpf;
+
+			// Particles need to have a fixed geometry the first frame of their life or things go bonkerz when framerate varies.
+			var deduct = tpf;
+			if (!particle.frameCount) {
+				deduct = 0.016;
+			}
+
+			particle.lifeSpan -= deduct;
 			if (!sim.params.data.eternal.value) {
-				if (particle.lifeSpan >= particle.lifeSpanTotal) {
+				if (particle.lifeSpan <= 0) {
 					particle.dead = true;
 					this.aliveParticles--;
 					sim.notifyDied(particle);
@@ -244,31 +278,37 @@ function (
 				}
 			}
 
+			// Note frame offset expects ideal frame to make stable geometries
+			particle.progress = 1-((particle.lifeSpan - particle.frameOffset*0.016)  / particle.lifeSpanTotal);
+
 			for (j = 0; j < sim.behaviors.length; j++) {
-				this.behaviors[j](tpf, particle, this.settings, this);
+				this.behaviors[j](deduct, particle, this.settings, this);
 			}
 
-			particle.size += particle.growth * tpf;
-			particle.rotation += particle.spin * tpf;
+			particle.size += this.valueFromCurve(particle.progress, particle.growth) * deduct;
+			particle.rotation += this.valueFromCurve(particle.progress, particle.spin) * deduct;
 
-			particle.velocity.muld(acc, acc, acc);
-			if (particle.velocity.lengthSquared() < 0.0001) {
-				particle.velocity.setd(0, 0, 0);
-			}
-			this.calcVec.setv(particle.velocity).muld(tpf, tpf, tpf);
+			particle.velocity.muld(particle.acceleration*deduct, particle.acceleration*deduct, particle.acceleration*deduct);
+
+			// Strange special case, needed?
+		//	if (particle.velocity.lengthSquared() < 0.0001) {
+		//		particle.velocity.setd(0, 0, 0);
+		//	}
+
+			particle.velocity.add_d(0, particle.gravity * deduct, 0);
+			this.calcVec.setv(particle.velocity).muld(deduct, deduct, deduct);
 			particle.position.addv(this.calcVec);
 
-			this.alphaFunction(particle);
-
-			particle.color.data[3] = particle.alpha * this.valueFromCurve(particle.progress, particle.alphaCurve);
-			particle.growth = this.valueFromCurve(particle.progress, particle.growthCurve);
-
+			particle.color.data[3] = particle.opacity * this.valueFromCurve(particle.progress, particle.alpha);
 
 		    sim.renderParticle(particle);
-
-
-
 		}
+
+		if (sim.particles.length == 0) {
+			this.removeSims.push(sim);
+		}
+
+		this.removeSims.length = 0;
 	};
 
 	var i;
@@ -278,16 +318,16 @@ function (
 			return;
 		}
 
-		if (this.spawner) {
-			this.spawner(this);
-		}
-
 		for (i = 0; i < this.simulations.length; i++) {
 			this.updateSimulation(tpf, this.simulations[i]);
 		}
 
 		for (i = 0; i < this.renderers.length; i++) {
 			this.renderers[i].updateMeshdata();
+		}
+
+		for (i = 0; i < this.removeSims.length; i++) {
+			this.removeSimulation(this.removeSims[i]);
 		}
 	};
 

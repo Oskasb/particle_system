@@ -14,25 +14,11 @@ define([
 					"type": "color"
 				},
 				{
-					"param":"size",
-					"value": [0.3, 0.3],
+					"param":"opacity",
+					"value": [0, 1],
 					"type": "range",
 					"min": 0.0,
-					"max": 2.0
-				},
-				{
-					"param":"rotation",
-					"value": [0, 360],
-					"type": "range",
-					"min": 0.0,
-					"max": 6.29
-				},
-				{
-					"param":"growth",
-					"value": "zeroToOne",
-					"type": "option",
-					"values":   ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"],
-					"texts":    ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
+					"max": 1.0
 				},
 				{
 					"param":"alpha",
@@ -42,45 +28,71 @@ define([
 					"texts":    ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
 				},
 				{
-					"param":"spin",
-					"value": [-1, 1],
+					"param":"size",
+					"value": [0.3, 0.3],
 					"type": "range",
-					"min": -5.0,
+					"min": 0.0,
+					"max": 10.0
+				},
+				{
+					"param":"growth",
+					"value": "zeroToOne",
+					"type": "option",
+					"values":   ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"],
+					"texts":    ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
+				},
+				{
+					"param":"strength",
+					"value": 1,
+					"type": "number",
+					"min": 0.0,
+					"max": 10.0
+				},
+				{
+					"param":"spread",
+					"value": 1,
+					"type": "number",
+					"min": 0.0,
+					"max": 1.0
+				},
+				{
+					"param":"acceleration",
+					"value": 0.98,
+					"type": "number",
+					"min": 0.0,
 					"max": 5.0
+				},
+				{
+					"param":"gravity",
+					"value": 0,
+					"type": "number",
+					"min": -20.0,
+					"max": 20.0
+				},
+				{
+					"param":"rotation",
+					"value": [0, 360],
+					"type": "range",
+					"min": 0.0,
+					"max": 6.29
+				},
+				{
+					"param":"spin",
+					"value": "oneToZero",
+					"type": "option",
+					"values":["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"],
+					"texts": ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
 				},
 				{
 					"param": "lifespan",
 					"value": [1, 4],
 					"type": "range",
 					"min": 0.0,
-					"max": 5.0
-				},
-				{
-					"param":"damping",
-					"value": 0.4,
-					"type": "number",
-					"min": 0.0,
-					"max": 2.0
-				},
-				{
-					"param":"acceleration",
-					"value": 0.94,
-					"type": "number",
-					"min": 0.0,
-					"max": 5.0
-				},
-				{
-					"param":"skipFade",
-					"value": true,
-					"type": "boolean"
-				},
-				{
-					"param":"eternal",
-					"value": true,
-					"type": "boolean"
+					"max": 25.0
 				}
 			],
 			simulator_config:{
+
 				"follow": {
 					"value": "box",
 					"type": "string"
