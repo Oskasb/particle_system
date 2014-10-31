@@ -21,8 +21,6 @@ function (
 		this.size = 1;
 		this.growth = [[0, 1], [1, 0]];
 
-		this.strength = 1;
-		this.spread = 1;
 		this.acceleration = 1;
 		this.gravity = 0;
 

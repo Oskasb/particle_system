@@ -221,28 +221,32 @@ function (
 				particle.position.y = sim.position.y + sim.normal.y*ratio;
 				particle.position.z = sim.position.z + sim.normal.z*ratio;
 
-				particle.acceleration = sim.acceleration;
-				particle.gravity = sim.gravity;
-				particle.alphaCurve = sim.alphaCurve;
-				particle.growthCurve = sim.growthCurve;
-
-				particle.lifeSpanTotal = particle.lifeSpan = randomBetween(sim.lifeSpan[0], sim.lifeSpan[1]);
-
-				particle.frameOffset = count/sim.effectCount;
-
 				particle.velocity.x = sim.strength*((Math.random() -0.5) * (2*sim.spread) + (1-sim.spread)*sim.normal.x);
 				particle.velocity.y = sim.strength*((Math.random() -0.5) * (2*sim.spread) + (1-sim.spread)*sim.normal.y);
 				particle.velocity.z = sim.strength*((Math.random() -0.5) * (2*sim.spread) + (1-sim.spread)*sim.normal.z);
 
+				particle.color.set(sim.color);
+				particle.opacity = sim.opacity;
+				particle.alpha = sim.alpha;
+
+				particle.size = sim.size;
+				particle.growth = sim.growth;
+
+
+				particle.acceleration = sim.acceleration;
+				particle.gravity = sim.gravity;
+
+				particle.lifeSpan = randomBetween(sim.lifeSpan[0], sim.lifeSpan[1]);
+				particle.lifeSpanTotal = particle.lifeSpan;
+
+				particle.frameOffset = count/sim.effectCount;
+
 				particle.dead = false;
 				this.aliveParticles++;
-				particle.gravity = sim.gravity;
-				particle.opacity = sim.opacity;
 
 				count--;
 
 				sim.particles.push(particle);
-
 			}
 		}
 	};
@@ -261,7 +265,6 @@ function (
 				continue;
 			}
 
-
 			// Particles need to have a fixed geometry the first frame of their life or things go bonkerz when framerate varies.
 			var deduct = tpf;
 			if (!particle.frameCount) {
@@ -269,13 +272,11 @@ function (
 			}
 
 			particle.lifeSpan -= deduct;
-			if (!sim.params.data.eternal.value) {
-				if (particle.lifeSpan <= 0) {
-					particle.dead = true;
-					this.aliveParticles--;
-					sim.notifyDied(particle);
-					continue;
-				}
+			if (particle.lifeSpan <= 0) {
+				particle.dead = true;
+				this.aliveParticles--;
+				sim.notifyDied(particle);
+				continue;
 			}
 
 			// Note frame offset expects ideal frame to make stable geometries
@@ -308,7 +309,6 @@ function (
 			this.removeSims.push(sim);
 		}
 
-		this.removeSims.length = 0;
 	};
 
 	var i;
@@ -329,6 +329,8 @@ function (
 		for (i = 0; i < this.removeSims.length; i++) {
 			this.removeSimulation(this.removeSims[i]);
 		}
+
+		this.removeSims.length = 0;
 	};
 
 	return ParticleSimulator;
