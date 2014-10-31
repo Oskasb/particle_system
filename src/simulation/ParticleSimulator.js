@@ -279,7 +279,7 @@ function (
 				continue;
 			}
 
-			// Note frame offset expects ideal frame to make stable geometries
+			// Note frame offset expects ideal frame (0.016) to make stable geometries
 			particle.progress = 1-((particle.lifeSpan - particle.frameOffset*0.016)  / particle.lifeSpanTotal);
 
 			for (j = 0; j < sim.behaviors.length; j++) {
