@@ -346,25 +346,23 @@ define([
 			this.entity.hidden = !visible;
 		};
 
-		TrailRenderer.prototype.died = function(index, particle) {
-			var trailData = this.trailDatas[index];
+		TrailRenderer.prototype.died = function(particle) {
+			var trailData = this.trailDatas[particle.index];
 			trailData.isReset = true;
-			// for (var i = 0; i < this.segmentCount; i++) {
-			// 	var trailSegmentData = trailData.trailSegmentDatas[i];
-			// 	trailSegmentData.position.setd(0,0,0);
-			// }
+		};
 
-			// var pos = this.meshData.getAttributeBuffer(MeshData.POSITION);
+		TrailRenderer.prototype.updateParticle = function(tpf, particle) {
+			this.renderedCount++;
 
-			// for (var j = 0; j < this.segmentCount; j++) {
-			// 	pos[(index * this.segmentCount * 6) + 6 * j + 0] = 0;
-			// 	pos[(index * this.segmentCount * 6) + 6 * j + 1] = 0;
-			// 	pos[(index * this.segmentCount * 6) + 6 * j + 2] = 0;
+			if (particle.dead) {
+				continue;
+			}
 
-			// 	pos[(index * this.segmentCount * 6) + 6 * j + 3] = 0;
-			// 	pos[(index * this.segmentCount * 6) + 6 * j + 4] = 0;
-			// 	pos[(index * this.segmentCount * 6) + 6 * j + 5] = 0;
-			// }
+			var trailData = this.trailDatas[this.renderedCount];
+			this.setTrailFront(trailData, particle.position, null, tpf);
+			this.updateTrail(trailData, particle, Renderer.mainCamera.translation, this.renderedCount);
+
+			this.lastAlive = this.renderedCount + 1;
 		};
 
 		TrailRenderer.prototype.update = function(tpf, particles) {
@@ -376,60 +374,17 @@ define([
 			material.uniforms.alphakill = this.settings.alphakill.value;
 			material.blendState.blending = this.settings.blending.value;
 
-			// var tile = this.meshData.getAttributeBuffer('TILE');
-			// var tileInfo = this.settings.tile;
-			// var isTiled = tileInfo !== undefined && tileInfo.enabled;
-
-			// var tileCountX = 1;
-			// var tileCountY = 1;
-			// var loopScale = 1;
-			// if (isTiled) {
-			// 	tileCountX = tileInfo.tileCountX;
-			// 	tileCountY = tileInfo.tileCountY;
-			// 	loopScale = tileInfo.loopScale;
-			// }
-			// var scaleX = 1 / tileCountX;
-			// var scaleY = 1 / tileCountY;
-			// var totalTileCount = tileCountX * tileCountY;
-			// var tileFrameCount = totalTileCount;
-			// if (isTiled && tileInfo.frameCount) {
-			// 	tileFrameCount = tileInfo.frameCount;
-			// }
-
-			var lastAlive = 0;
 			var j, i, l;
 			for (i = 0, l = particles.length; i < l; i++) {
-				var particle = particles[i];
-
-				if (particle.dead) {
-					continue;
-				}
-
-				// if (isTiled) {
-				// 	var tileTime = (((particle.lifeSpan / particle.lifeSpanTotal) * loopScale) % 1) * totalTileCount;
-				// 	tileTime = Math.floor(tileTime) % tileFrameCount;
-				// 	var offsetX = (tileTime % tileCountX) / tileCountX;
-				// 	var offsetY = 1 - scaleY - Math.floor(tileTime / tileCountX) / tileCountY;
-
-				// 	for (j = 0; j < 4; j++) {
-				// 		tile[(4 * 4 * i + 0) + 4 * j] = offsetX;
-				// 		tile[(4 * 4 * i + 1) + 4 * j] = offsetY;
-				// 		tile[(4 * 4 * i + 2) + 4 * j] = scaleX;
-				// 		tile[(4 * 4 * i + 3) + 4 * j] = scaleY;
-				// 	}
-				// }
-
-				var trailData = this.trailDatas[i];
-				this.setTrailFront(trailData, particle.position, null, tpf);
-				this.updateTrail(trailData, particle, Renderer.mainCamera.translation, i);
-
-				lastAlive = i + 1;
+		//		this.updateParticle(tpf, particles[i]);
 			}
 
-			this.meshData.indexLengths = [lastAlive * (this.segmentCount - 1) * 6];
-			this.meshData.indexCount = lastAlive * (this.segmentCount - 1) * 6;
+			this.meshData.indexLengths = [this.lastAlive * (this.segmentCount - 1) * 6];
+			this.meshData.indexCount = this.lastAlive * (this.segmentCount - 1) * 6;
 
 			this.meshData.setVertexDataUpdated();
+			this.lastAlive = 0;
+			this.renderedCount = 0;
 		};
 
 		var particleShader = {

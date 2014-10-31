@@ -112,7 +112,7 @@ function (
 		this.entity.hidden = !visible;
 	};
 
-	TriangleRenderer.prototype.died = function (i, particle) {
+	TriangleRenderer.prototype.died = function (particle) {
 		// var data = this.meshData.getAttributeBuffer('DATA');
 
 		// for (var j = 0; j < 4; j++) {

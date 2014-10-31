@@ -101,11 +101,11 @@ function (
 		this.entity.hidden = !visible;
 	};
 
-	ParticleRenderer.prototype.died = function (i, particle) {
+	ParticleRenderer.prototype.died = function (particle) {
 		var data = this.meshData.getAttributeBuffer('DATA');
 
 		for (var j = 0; j < 4; j++) {
-			data[(4 * 2 * i + 0) + 2 * j] = 0;
+			data[(4 * 2 * particle.index + 0) + 2 * j] = 0;
 		}
 	};
 

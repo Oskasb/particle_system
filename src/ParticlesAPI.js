@@ -1,13 +1,12 @@
 "use strict";
 define([
-	'particle_system/chaos/ParticleSystem'
+	'particle_system/ParticleSystem'
 ],
 	function (
 		ParticleSystem
 		) {
 
 		var ParticlesAPI = function(goo) {
-			console.log("Particles API", goo)
 			this.particleSystem = new ParticleSystem(goo);
 		};
 
@@ -20,6 +19,10 @@ define([
 		};
 
 		ParticlesAPI.prototype.spawnParticles = function(id, position, normal, effectData) {
+			this.particleSystem.spawnParticleSimulation(id, position, normal, effectData)
+		};
+
+		ParticlesAPI.prototype.wakeParticle = function(id, position, normal, effectData) {
 			this.particleSystem.wakeParticle(id)
 		};
 

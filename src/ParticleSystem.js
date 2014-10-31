@@ -1,5 +1,5 @@
 define([
-	'particle_system/chaos/ParticleSimulator'
+	'particle_system/simulation/ParticleSimulator'
 ],
 
 function (
@@ -16,6 +16,10 @@ function (
 	ParticleSystem.prototype.add = function (settings) {
 		var simulator = new ParticleSimulator(this.goo, settings);
 		this.simulators[settings.id] = simulator;
+	};
+
+	ParticleSystem.prototype.spawnParticleSimulation = function(id, position, normal, effectData) {
+		this.simulators[id].addEffectSimulation(position, normal, effectData)
 	};
 
 	ParticleSystem.prototype.get = function (id) {

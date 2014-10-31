@@ -48,6 +48,12 @@ function (
 			'min': 0.0,
 			'max': 2.0
 		},
+		'acceleration': {
+			'value': 0.94,
+			'type': 'number',
+			'min': 0.0,
+			'max': 5.0
+		},
 		'skipFade': {
 			'value': true,
 			'type': 'boolean'

@@ -1,19 +1,22 @@
 define([
-	'particle_system/chaos/Particle',
+	'particle_system/simulation/Particle',
+
+	'particle_system/simulation/ParticleSimulation',
 	'goo/math/Vector3',
 	'goo/math/Vector4',
 	'goo/math/MathUtils',
 	'goo/renderer/MeshData',
 	'goo/entities/EntityUtils',
 	'particle_system/chaos/ParticleBehaviors',
-	'particle_system/chaos/ParticleRenderer',
-	'particle_system/chaos/LineRenderer',
-	'particle_system/chaos/TriangleRenderer',
-	'particle_system/chaos/TrailRenderer'
+	'particle_system/render/ParticleRenderer',
+	'particle_system/render/LineRenderer',
+	'particle_system/render/TriangleRenderer',
+	'particle_system/render/TrailRenderer'
 ],
 
 function (
 	Particle,
+	ParticleSimulation,
 	Vector3,
 	Vector4,
 	MathUtils,
@@ -44,13 +47,15 @@ function (
 			return new TriangleRenderer();
 		} else if (name === 'TrailRenderer') {
 			return new TrailRenderer();
-		} 
+		}
 	}
 
 	function ParticleSimulator(goo, settings) {
 		this.goo = goo;
-
+		this.settings = settings;
 		this.meshPositions = [];
+		this.simulations = [];
+
 		var entity = goo.world.by.name(settings.follow.value).first();
 		if (entity) {
 			if (settings.followType.value === 'Mesh') {
@@ -79,36 +84,26 @@ function (
 
 		this.particles = [];
 		for (var i = 0; i < settings.poolCount; i++) {
-			var particle = new Particle();
-			this.particles[i] = particle;
+			this.particles[i] = new Particle(i);
 		}
 
 		this.aliveParticles = 0;
 
-		this.settings = settings;
+
 		this.setup = settings.setup;
 		this.spawner = createSpawner(settings.spawner.value);
 
 		this.behaviors = [];
 
 		for (i = 0; i < settings.behaviors.length; i++) {
-			var name = settings.behaviors[i];
-			this.behaviors[i] = createSpawner(name);
+			this.attachSpawnBehaviour(i, settings.behaviors[i])
 		}
 
 		this.renderers = [];
 		settings.renderers = settings.renderers || {};
 
 		for (var rendererName in settings.renderers) {
-			var rendererObj = settings.renderers[rendererName];
-			var instance = createRenderer(rendererName);
-			instance.topSettings = settings;
-			instance.globalSettings = rendererObj;
-			this.renderers.push(instance);
-			if (instance.init) {
-				instance.init(goo, rendererObj.settings);
-				instance.setVisible(rendererObj.enabled);
-			}
+			this.initRenderer(rendererName);
 		}
 
 		if (this.setup) {
@@ -132,20 +127,32 @@ function (
 		this.calcVec = new Vector3();
 	}
 
-	function updateWorldTransform(transformComponent) {
-		transformComponent.updateWorldTransform();
-		var entity = transformComponent.entity;
-		if (entity && entity.meshDataComponent && entity.meshRendererComponent) {
-			entity.meshRendererComponent.updateBounds(
-				entity.meshDataComponent.modelBound,
-				transformComponent.worldTransform
-			);
+	ParticleSimulator.prototype.addEffectSimulation = function(position, normal, effectData) {
+		var sim = new ParticleSimulation(new Vector3(position), new Vector3(normal), this.settings, effectData);
+
+		for (var i = 0; i < this.renderers.length; i++) {
+			sim.registerParticleRenderer(this.renderers[i]);
 		}
 
-		for (var i = 0; i < transformComponent.children.length; i++) {
-			updateWorldTransform(transformComponent.children[i]);
+		this.simulations.push(sim)
+	};
+
+	ParticleSimulator.prototype.attachSpawnBehaviour = function(nr, rendererName) {
+		this.behaviors[nr] = createSpawner(rendererName);
+	};
+
+	ParticleSimulator.prototype.initRenderer = function(rendererName) {
+		var rendererConf = this.settings.renderers[rendererName];
+		var renderer = createRenderer(rendererName);
+		renderer.topSettings = this.settings;
+		renderer.globalSettings = rendererConf;
+		this.renderers.push(renderer);
+		if (renderer.init) {
+			renderer.init(this.goo, rendererConf.settings);
+			renderer.setVisible(rendererConf.enabled);
 		}
-	}
+	};
+
 
 	ParticleSimulator.prototype.rebuild = function () {
 		this.spawner = createSpawner(this.settings.spawner.value);
@@ -200,6 +207,52 @@ function (
 		}
 	};
 
+	ParticleSimulator.prototype.updateSimulation = function (sim, tpf) {
+
+
+		var acc = 1 - tpf * (sim.params.acceleration || 1);
+		var i, j, l;
+		for (i = 0, l = sim.particles.length; i < l; i++) {
+			var particle = sim.particles[i];
+
+			if (particle.dead) {
+				continue;
+			}
+
+			particle.lifeSpan += tpf;
+			if (!sim.params.eternal.value) {
+				if (particle.lifeSpan >= particle.lifeSpanTotal) {
+					particle.dead = true;
+					this.aliveParticles--;
+					sim.notifyDied(particle);
+					continue;
+				}
+			}
+
+			for (j = 0; j < sim.behaviors.length; j++) {
+				this.behaviors[j](tpf, particle, this.settings, this);
+			}
+
+			particle.size += particle.growth * tpf;
+			particle.rotation += particle.spin * tpf;
+
+			particle.velocity.muld(acc, acc, acc);
+			if (particle.velocity.lengthSquared() < 0.0001) {
+				particle.velocity.setd(0, 0, 0);
+			}
+			this.calcVec.setv(particle.velocity).muld(tpf, tpf, tpf);
+			particle.position.addv(this.calcVec);
+
+			this.alphaFunction(particle);
+
+		    sim.renderParticle(particle);
+
+
+
+		}
+	};
+
+
 	ParticleSimulator.prototype.update = function (tpf) {
 		if (!this.visible) {
 			return;
@@ -209,43 +262,10 @@ function (
 			this.spawner(this);
 		}
 
-		var velocityMultiplier = tpf;
-		var damp = 1 - tpf * (this.settings.damping.value || 0);
-		var i, j, l;
-		for (i = 0, l = this.particles.length; i < l; i++) {
-			var particle = this.particles[i];
+		var i;
 
-			if (particle.dead) {
-				continue;
-			}
-
-			particle.lifeSpan += tpf;
-			if (!this.settings.eternal.value) {
-				if (particle.lifeSpan >= particle.lifeSpanTotal) {
-					particle.dead = true;
-					this.aliveParticles--;
-					for (j = 0; j < this.renderers.length; j++) {
-						this.renderers[j].died(i, particle);
-					}
-					continue;
-				}
-			}
-
-			for (j = 0; j < this.behaviors.length; j++) {
-				this.behaviors[j](tpf, particle, this.settings, this);
-			}
-
-			particle.size += particle.growth * tpf;
-			particle.rotation += particle.spin * tpf;
-
-			particle.velocity.muld(damp, damp, damp);
-			if (particle.velocity.lengthSquared() < 0.0001) {
-				particle.velocity.setd(0, 0, 0);
-			}
-			this.calcVec.setv(particle.velocity).muld(velocityMultiplier, velocityMultiplier, velocityMultiplier);
-			particle.position.addv(this.calcVec);
-
-			this.alphaFunction(particle);
+		for (i = 0; i < this.simulations.length; i++) {
+			this.updateSimulation(tpf, sim);
 		}
 
 		for (i = 0; i < this.renderers.length; i++) {
