@@ -109,7 +109,82 @@ function (
 		}
 	};
 
-	ParticleRenderer.prototype.update = function (tpf, particles) {
+	ParticleRenderer.prototype.initFrame = function () {
+
+		this.pos = this.meshData.getAttributeBuffer(MeshData.POSITION);
+		this.col = this.meshData.getAttributeBuffer(MeshData.COLOR);
+		this.data = this.meshData.getAttributeBuffer('DATA');
+		this.tile = this.meshData.getAttributeBuffer('TILE');
+
+		this.tileInfo = this.settings.tile;
+		this.isTiled = this.tileInfo !== undefined && this.tileInfo.enabled.value;
+		this.tileCountX = 1;
+		this.tileCountY = 1;
+		this.loopScale = 1;
+		if (this.isTiled) {
+			this.tileCountX = this.tileInfo.tileCountX.value;
+			this.tileCountY = this.tileInfo.tileCountY.value;
+			this.loopScale  = this.tileInfo.loopScale.value;
+		}
+		this.scaleX = 1 / this.tileCountX;
+		this.scaleY = 1 / this.tileCountY;
+		this.totalTileCount = this.tileCountX * this.tileCountY;
+		this.tileFrameCount = this.totalTileCount;
+		if (this.isTiled && this.tileInfo.frameCount) {
+			this.tileFrameCount = this.tileInfo.frameCount;
+		}
+
+		this.lastAlive = 0;
+
+	};
+
+	ParticleRenderer.prototype.updateParticle = function (tpf, particle) {
+		if (!this.renderedCount) {
+			 this.initFrame();
+		}
+		this.renderedCount++;
+
+
+		if (particle.dead) {
+			continue;
+		}
+		var j, i, l;
+		i = this.renderedCount;
+		if (this.isTiled) {
+			var tileTime = (((particle.lifeSpan / particle.lifeSpanTotal) * this.loopScale) % 1) * this.totalTileCount;
+			tileTime = Math.floor(tileTime) % this.tileFrameCount;
+			var offsetX = (tileTime % this.tileCountX) / this.tileCountX;
+			var offsetY = 1 - this.scaleY - Math.floor(tileTime / this.tileCountX) / this.tileCountY;
+
+			for (j = 0; j < 4; j++) {
+				this.tile[(4 * 4 * i + 0) + 4 * j] = offsetX;
+				this.tile[(4 * 4 * i + 1) + 4 * j] = offsetY;
+				this.tile[(4 * 4 * i + 2) + 4 * j] = this.scaleX;
+				this.tile[(4 * 4 * i + 3) + 4 * j] = this.scaleY;
+			}
+		}
+
+		var posdata = particle.position.data;
+		var coldata = particle.color.data;
+		for (j = 0; j < 4; j++) {
+			this.pos[(4 * 3 * i + 0) + 3 * j] = posdata[0];
+			this.pos[(4 * 3 * i + 1) + 3 * j] = posdata[1];
+			this.pos[(4 * 3 * i + 2) + 3 * j] = posdata[2];
+
+			this.col[(4 * 4 * i + 0) + 4 * j] = coldata[0];
+			this.col[(4 * 4 * i + 1) + 4 * j] = coldata[1];
+			this.col[(4 * 4 * i + 2) + 4 * j] = coldata[2];
+			this.col[(4 * 4 * i + 3) + 4 * j] = particle.alpha;
+
+			this.data[(4 * 2 * i + 0) + 2 * j] = particle.size;
+			this.data[(4 * 2 * i + 1) + 2 * j] = particle.rotation;
+		}
+
+		this.lastAlive = i + 1;
+
+	};
+
+	ParticleRenderer.prototype.updateMeshdata = function (tpf, particles) {
 		if (this.entity.hidden) {
 			return;
 		}
@@ -118,74 +193,9 @@ function (
 		material.uniforms.alphakill = this.settings.alphakill.value;
 		material.blendState.blending = this.settings.blending.value;
 
-		var pos = this.meshData.getAttributeBuffer(MeshData.POSITION);
-		var col = this.meshData.getAttributeBuffer(MeshData.COLOR);
-		var data = this.meshData.getAttributeBuffer('DATA');
-		var tile = this.meshData.getAttributeBuffer('TILE');
-
-		var tileInfo = this.settings.tile;
-		var isTiled = tileInfo !== undefined && tileInfo.enabled.value;
-		var tileCountX = 1;
-		var tileCountY = 1;
-		var loopScale = 1;
-		if (isTiled) {
-			tileCountX = tileInfo.tileCountX.value;
-			tileCountY = tileInfo.tileCountY.value;
-			loopScale = tileInfo.loopScale.value;
-		}
-		var scaleX = 1 / tileCountX;
-		var scaleY = 1 / tileCountY;
-		var totalTileCount = tileCountX * tileCountY;
-		var tileFrameCount = totalTileCount;
-		if (isTiled && tileInfo.frameCount) {
-			tileFrameCount = tileInfo.frameCount;
-		}
-
-		var lastAlive = 0;
-		var j, i, l;
-		for (i = 0, l = particles.length; i < l; i++) {
-			var particle = particles[i];
-
-			if (particle.dead) {
-				continue;
-			}
-
-			if (isTiled) {
-				var tileTime = (((particle.lifeSpan / particle.lifeSpanTotal) * loopScale) % 1) * totalTileCount;
-				tileTime = Math.floor(tileTime) % tileFrameCount;
-				var offsetX = (tileTime % tileCountX) / tileCountX;
-				var offsetY = 1 - scaleY - Math.floor(tileTime / tileCountX) / tileCountY;
-
-				for (j = 0; j < 4; j++) {
-					tile[(4 * 4 * i + 0) + 4 * j] = offsetX;
-					tile[(4 * 4 * i + 1) + 4 * j] = offsetY;
-					tile[(4 * 4 * i + 2) + 4 * j] = scaleX;
-					tile[(4 * 4 * i + 3) + 4 * j] = scaleY;
-				}
-			}
-
-			var posdata = particle.position.data;
-			var coldata = particle.color.data;
-			for (j = 0; j < 4; j++) {
-				pos[(4 * 3 * i + 0) + 3 * j] = posdata[0];
-				pos[(4 * 3 * i + 1) + 3 * j] = posdata[1];
-				pos[(4 * 3 * i + 2) + 3 * j] = posdata[2];
-
-				col[(4 * 4 * i + 0) + 4 * j] = coldata[0];
-				col[(4 * 4 * i + 1) + 4 * j] = coldata[1];
-				col[(4 * 4 * i + 2) + 4 * j] = coldata[2];
-				col[(4 * 4 * i + 3) + 4 * j] = particle.alpha;
-
-				data[(4 * 2 * i + 0) + 2 * j] = particle.size;
-				data[(4 * 2 * i + 1) + 2 * j] = particle.rotation;
-			}
-
-			lastAlive = i + 1;
-		}
-
-		this.meshData.indexLengths = [lastAlive * 6];
-		this.meshData.indexCount = lastAlive * 6;
-
+		this.meshData.indexLengths = [this.lastAlive * 6];
+		this.meshData.indexCount = this.lastAlive * 6;
+		this.renderedCount = 0;
 		this.meshData.setVertexDataUpdated();
 	};
 

@@ -55,7 +55,8 @@ function (
 		this.settings = settings;
 		this.meshPositions = [];
 		this.simulations = [];
-
+	/*
+	// move to behaviour logic...
 		var entity = goo.world.by.name(settings.follow.value).first();
 		if (entity) {
 			if (settings.followType.value === 'Mesh') {
@@ -81,9 +82,9 @@ function (
 				settings.poolCount = Math.min(this.jointTransforms.length, 100);
 			}
 		}
-
+     */
 		this.particles = [];
-		for (var i = 0; i < settings.poolCount; i++) {
+		for (var i = 0; i < settings.simulator_config.poolCount; i++) {
 			this.particles[i] = new Particle(i);
 		}
 
@@ -91,12 +92,12 @@ function (
 
 
 		this.setup = settings.setup;
-		this.spawner = createSpawner(settings.spawner.value);
+		this.spawner = createSpawner(settings.simulator_config.spawner.value);
 
 		this.behaviors = [];
 
-		for (i = 0; i < settings.behaviors.length; i++) {
-			this.attachSpawnBehaviour(i, settings.behaviors[i])
+		for (i = 0; i < settings.simulator_config.behaviors.length; i++) {
+			this.attachSpawnBehaviour(i, settings.simulator_config.behaviors[i])
 		}
 
 		this.renderers = [];
@@ -128,7 +129,7 @@ function (
 	}
 
 	ParticleSimulator.prototype.addEffectSimulation = function(position, normal, effectData) {
-		var sim = new ParticleSimulation(new Vector3(position), new Vector3(normal), this.settings, effectData);
+		var sim = new ParticleSimulation(new Vector3(position), new Vector3(normal), this.settings.simulation_params, effectData);
 
 		for (var i = 0; i < this.renderers.length; i++) {
 			sim.registerParticleRenderer(this.renderers[i]);
@@ -207,10 +208,24 @@ function (
 		}
 	};
 
+	ParticleSimulator.prototype.getInterpolatedInCurveAboveIndex = function(value, curve, index) {
+		return curve[index][1] + (value - curve[index][0]) / (curve[index+1][0] - curve[index][0])*(curve[index+1][1]-curve[index][1]);
+	};
+
+	ParticleSimulator.prototype.valueFromCurve = function(value, curve) {
+		for (var i = 0; i < curve.length; i++) {
+			if (!curve[i+1]) return 0;
+			if (curve[i+1][0] > value) return this.getInterpolatedInCurveAboveIndex(value, curve, i)
+		}
+		return 0;
+	};
+
+
 	ParticleSimulator.prototype.updateSimulation = function (sim, tpf) {
 
 
 		var acc = 1 - tpf * (sim.params.acceleration || 1);
+
 		var i, j, l;
 		for (i = 0, l = sim.particles.length; i < l; i++) {
 			var particle = sim.particles[i];
@@ -220,7 +235,7 @@ function (
 			}
 
 			particle.lifeSpan += tpf;
-			if (!sim.params.eternal.value) {
+			if (!sim.params.data.eternal.value) {
 				if (particle.lifeSpan >= particle.lifeSpanTotal) {
 					particle.dead = true;
 					this.aliveParticles--;
@@ -245,6 +260,10 @@ function (
 
 			this.alphaFunction(particle);
 
+			particle.color.data[3] = particle.alpha * this.valueFromCurve(particle.progress, particle.alphaCurve);
+			particle.growth = this.valueFromCurve(particle.progress, particle.growthCurve);
+
+
 		    sim.renderParticle(particle);
 
 
@@ -252,6 +271,7 @@ function (
 		}
 	};
 
+	var i;
 
 	ParticleSimulator.prototype.update = function (tpf) {
 		if (!this.visible) {
@@ -262,14 +282,12 @@ function (
 			this.spawner(this);
 		}
 
-		var i;
-
 		for (i = 0; i < this.simulations.length; i++) {
-			this.updateSimulation(tpf, sim);
+			this.updateSimulation(tpf, this.simulations[i]);
 		}
 
 		for (i = 0; i < this.renderers.length; i++) {
-			this.renderers[i].update(tpf, this.particles);
+			this.renderers[i].updateMeshdata();
 		}
 	};
 

@@ -365,7 +365,7 @@ define([
 			this.lastAlive = this.renderedCount + 1;
 		};
 
-		TrailRenderer.prototype.update = function(tpf, particles) {
+		TrailRenderer.prototype.updateMeshdata = function() {
 			if (this.entity.hidden) {
 				return;
 			}
@@ -373,11 +373,6 @@ define([
 			var material = this.entity.meshRendererComponent.materials[0];
 			material.uniforms.alphakill = this.settings.alphakill.value;
 			material.blendState.blending = this.settings.blending.value;
-
-			var j, i, l;
-			for (i = 0, l = particles.length; i < l; i++) {
-		//		this.updateParticle(tpf, particles[i]);
-			}
 
 			this.meshData.indexLengths = [this.lastAlive * (this.segmentCount - 1) * 6];
 			this.meshData.indexCount = this.lastAlive * (this.segmentCount - 1) * 6;
