@@ -11,10 +11,20 @@ function (
 
 	function Particle(idx) {
 		this.index = idx;
-		this.position = new Vector3();
-		this.velocity = new Vector3();
+		this.position 	= new Vector3();
+		this.velocity 	= new Vector3();
+		this.color 		= new Vector4();
+		this.id = Particle.ID++;
+		this.reset();
+	}
 
-		this.color = new Vector4();
+	Particle.ID = 0;
+
+	Particle.prototype.reset = function () {
+		this.position.set(0, 0, 0);
+		this.velocity.set(0, 0, 0);
+		this.color.set(1, 1, 1, 1);
+
 		this.opacity = 1;
 		this.alpha = [[0, 0], [1, 1]];
 
@@ -29,15 +39,11 @@ function (
 
 		this.lifeSpan = 0;
 		this.lifeSpanTotal = 0;
-
 		this.progress = 0;
 		this.frameOffset = 0;
 		this.frameCount = 0;
 		this.dead = true;
-		this.id = Particle.ID++;
-	}
-
-	Particle.ID = 0;
+	};
 
 	Particle.prototype.setDataUsage = function () {
 	};

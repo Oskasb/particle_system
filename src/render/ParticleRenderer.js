@@ -146,7 +146,7 @@ function (
 
 
 		if (particle.dead) {
-			continue;
+			return;
 		}
 		var j, i, l;
 		i = this.renderedCount;
@@ -174,7 +174,7 @@ function (
 			this.col[(4 * 4 * i + 0) + 4 * j] = coldata[0];
 			this.col[(4 * 4 * i + 1) + 4 * j] = coldata[1];
 			this.col[(4 * 4 * i + 2) + 4 * j] = coldata[2];
-			this.col[(4 * 4 * i + 3) + 4 * j] = particle.alpha;
+			this.col[(4 * 4 * i + 3) + 4 * j] = coldata[3];
 
 			this.data[(4 * 2 * i + 0) + 2 * j] = particle.size;
 			this.data[(4 * 2 * i + 1) + 2 * j] = particle.rotation;

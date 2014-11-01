@@ -23,7 +23,7 @@ define([
 		};
 
 		ParticlesAPI.prototype.wakeParticle = function(id, position, normal, effectData) {
-			this.particleSystem.wakeParticle(id)
+		//	this.particleSystem.wakeParticle(id)
 		};
 
 		ParticlesAPI.prototype.createParticleSystem = function(particleConfig) {

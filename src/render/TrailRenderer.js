@@ -64,7 +64,7 @@ define([
 
 			this.segmentCount = settings.segmentCount || 8;
 
-			settings.poolCount = this.topSettings.poolCount;
+			settings.poolCount = this.topSettings.simulator_config.poolCount;
 
 			var attributeMap = MeshData.defaultMap([MeshData.POSITION, MeshData.TEXCOORD0, MeshData.COLOR]);
 			attributeMap.TILE = MeshData.createAttribute(4, 'Float');
@@ -155,6 +155,8 @@ define([
 		TrailRenderer.prototype.setTrailFront = function(trailData, position, tangent, tpf) {
 			var trail = null;
 
+			if (!trailData) return;
+
 			if (trailData.isReset) {
 				for (var i = 0; i < this.segmentCount; i++) {
 					var trailSegmentData = trailData.trailSegmentDatas[i];
@@ -185,6 +187,9 @@ define([
 		};
 
 		TrailRenderer.prototype.updateTrail = function(trailData, particle, camPos, index) {
+
+			if (!trailData) return;
+
 			var trailSegmentDatas = trailData.trailSegmentDatas;
 
 			if (trailData.invalid || this.facingMode == 'Billboard') {
@@ -355,7 +360,7 @@ define([
 			this.renderedCount++;
 
 			if (particle.dead) {
-				continue;
+				return;
 			}
 
 			var trailData = this.trailDatas[this.renderedCount];

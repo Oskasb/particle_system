@@ -14,6 +14,7 @@ define([
 	    this.renderers = [];
 		this.params = new SimulationParameters(posVec, normVec, defaultSettings, effectData);
 		this.particles = [];
+
 	};
 
 
@@ -25,9 +26,19 @@ define([
 		this.behaviors[nr] = createSpawner(rendererName);
 	};
 
+	ParticleSimulation.prototype.cleanupDead = function() {
+
+		for (var i = 0; i < this.particles.length; i++) {
+			if (this.particles[i].dead) {
+				this.particles.splice(this.particles.indexOf(this.particles[i]), 1);
+				i--
+			}
+		}
+	};
+
 	ParticleSimulation.prototype.notifyDied = function(particle) {
 
-		this.particles.splice(this.particles.indexOf(particle), 1);
+		this.particles[this.particles.indexOf(particle.index)] == null;
 
 		for (var i = 0; i < this.renderers.length; i++) {
 			this.renderers[i].died(particle)
@@ -38,7 +49,10 @@ define([
 	ParticleSimulation.prototype.renderParticle = function(tpf, particle) {
 
 		for (var i = 0; i < this.renderers.length; i++) {
-			this.renderers[i].updateParticle(tpf, particle)
+			if (typeof(this.renderers[i].updateParticle) == 'function') {
+				this.renderers[i].updateParticle(tpf, particle)
+			}
+
 		}
 
 	};

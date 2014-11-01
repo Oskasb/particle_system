@@ -42,11 +42,25 @@ define([
 					"texts":    ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
 				},
 				{
+					"param":"stretch",
+					"value": 1,
+					"type": "number",
+					"min": 0.0,
+					"max": 1.0
+				},
+				{
 					"param":"strength",
 					"value": 1,
 					"type": "number",
 					"min": 0.0,
 					"max": 10.0
+				},
+				{
+					"param":"spread",
+					"value": 1,
+					"type": "number",
+					"min": 0.0,
+					"max": 1.0
 				},
 				{
 					"param":"spread",
@@ -71,10 +85,16 @@ define([
 				},
 				{
 					"param":"rotation",
-					"value": [0, 360],
+					"value": [0, 6.29],
 					"type": "range",
 					"min": 0.0,
 					"max": 6.29
+				}, 				{
+					"param":"count",
+					"value": 5,
+					"type": "number",
+					"min": 1,
+					"max": 100
 				},
 				{
 					"param":"spin",
@@ -91,7 +111,7 @@ define([
 					"max": 25.0
 				}
 			],
-			simulator_config:{
+			"simulator_config":{
 
 				"follow": {
 					"value": "box",
