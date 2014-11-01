@@ -21,20 +21,20 @@ function (
 		this.meshData = null;
 	}
 
-	ParticleRenderer.prototype.init = function (goo, settings) {
+	ParticleRenderer.prototype.init = function (goo, simConf, settings) {
 		this.settings = settings;
 
 		var attributeMap = MeshData.defaultMap([MeshData.POSITION, MeshData.COLOR]);
 		attributeMap.DATA = MeshData.createAttribute(2, 'Float');
 		attributeMap.OFFSET = MeshData.createAttribute(2, 'Float');
 		attributeMap.TILE = MeshData.createAttribute(4, 'Float');
-		var meshData = new MeshData(attributeMap, settings.poolCount * 4, settings.poolCount * 6);
+		var meshData = new MeshData(attributeMap, simConf.poolCount * 4, simConf.poolCount * 6);
 		meshData.vertexData.setDataUsage('DynamicDraw');
 		this.meshData = meshData;
 
 		var material = new Material(particleShader);
-		material.uniforms.alphakill = settings.alphakill.value;
-		material.blendState.blending = settings.blending.value;
+		material.uniforms.alphakill = simConf.alphakill.value;
+		material.blendState.blending = simConf.blending.value;
 
 		material.depthState.write = false;
 		material.renderQueue = 3010;
@@ -46,7 +46,7 @@ function (
 
 		entity.skip = true;
 		var textureCreator = new TextureCreator();
-		var texture = textureCreator.loadTexture2D(settings.textureUrl.value, {
+		var texture = textureCreator.loadTexture2D(this.settings.textureUrl.value, {
 			wrapS: 'EdgeClamp',
 			wrapT: 'EdgeClamp'
 		}, function() {
@@ -57,7 +57,7 @@ function (
 		var offset = this.meshData.getAttributeBuffer('OFFSET');
 		var tile = this.meshData.getAttributeBuffer('TILE');
 		var indices = this.meshData.getIndexBuffer();
-		for (var i = 0; i < settings.poolCount; i++) {
+		for (var i = 0; i < simConf.poolCount; i++) {
 			offset[8 * i + 0] = -1;
 			offset[8 * i + 1] = -1;
 
@@ -184,14 +184,10 @@ function (
 
 	};
 
-	ParticleRenderer.prototype.updateMeshdata = function (tpf, particles) {
+	ParticleRenderer.prototype.updateMeshdata = function () {
 		if (this.entity.hidden) {
 			return;
 		}
-
-		var material = this.entity.meshRendererComponent.materials[0];
-		material.uniforms.alphakill = this.settings.alphakill.value;
-		material.blendState.blending = this.settings.blending.value;
 
 		this.meshData.indexLengths = [this.lastAlive * 6];
 		this.meshData.indexCount = this.lastAlive * 6;

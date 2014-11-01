@@ -153,7 +153,7 @@ function (
 		renderer.globalSettings = rendererConf;
 		this.renderers.push(renderer);
 		if (renderer.init) {
-			renderer.init(this.goo, rendererConf.settings);
+			renderer.init(this.goo, this.settings.simulator_config, rendererConf.settings);
 			renderer.setVisible(rendererConf.enabled);
 		}
 	};

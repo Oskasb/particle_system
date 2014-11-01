@@ -28,20 +28,19 @@ function (
 	LineRenderer.calcVec1 = new Vector3();
 	LineRenderer.calcVec2 = new Vector3();
 
-	LineRenderer.prototype.init = function (goo, settings) {
+	LineRenderer.prototype.init = function (goo, simConf, settings) {
 		this.settings = settings;
-
 		var attributeMap = MeshData.defaultMap([MeshData.POSITION, MeshData.COLOR]);
 		attributeMap.DATA = MeshData.createAttribute(4, 'Float');
 		attributeMap.OFFSET = MeshData.createAttribute(2, 'Float');
 		attributeMap.TILE = MeshData.createAttribute(4, 'Float');
-		var meshData = new MeshData(attributeMap, this.settings.poolCount * 4, this.settings.poolCount * 6);
+		var meshData = new MeshData(attributeMap, simConf.poolCount * 4, simConf.poolCount * 6);
 		meshData.vertexData.setDataUsage('DynamicDraw');
 		this.meshData = meshData;
 
 		var material = new Material(particleShader);
-		material.uniforms.alphakill = settings.alphakill.value;
-		material.blendState.blending = settings.blending.value;
+		material.uniforms.alphakill = simConf.alphakill.value;
+		material.blendState.blending = simConf.blending.value;
 
 		material.depthState.write = false;
 		material.renderQueue = 3010;
@@ -64,7 +63,7 @@ function (
 		var offset = this.meshData.getAttributeBuffer('OFFSET');
 		var tile = this.meshData.getAttributeBuffer('TILE');
 		var indices = this.meshData.getIndexBuffer();
-		for (var i = 0; i < this.settings.poolCount; i++) {
+		for (var i = 0; i < simConf.poolCount; i++) {
 			offset[8 * i + 0] = -1;
 			offset[8 * i + 1] = -1;
 
@@ -212,10 +211,6 @@ function (
 		if (this.entity.hidden) {
 			return;
 		}
-
-		var material = this.entity.meshRendererComponent.materials[0];
-		material.uniforms.alphakill = this.settings.alphakill.value;
-		material.blendState.blending = this.settings.blending.value;
 
 		this.pairs.length = null;
 		var pairs = pairingFunction(this.pairs, particles, this.settings.distance.value, this.settings.limit.value);

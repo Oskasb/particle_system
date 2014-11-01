@@ -28,19 +28,18 @@ function (
 	TriangleRenderer.calcVec1 = new Vector3();
 	TriangleRenderer.calcVec2 = new Vector3();
 
-	TriangleRenderer.prototype.init = function (goo, settings) {
+	TriangleRenderer.prototype.init = function (goo, simConf, settings) {
 		this.settings = settings;
-
 		var attributeMap = MeshData.defaultMap([MeshData.POSITION, MeshData.COLOR]);
 		// attributeMap.DATA = MeshData.createAttribute(4, 'Float');
 		attributeMap.OFFSET = MeshData.createAttribute(2, 'Float');
-		var meshData = new MeshData(attributeMap, this.settings.poolCount * 3, this.settings.poolCount * 3);
+		var meshData = new MeshData(attributeMap, simConf.poolCount * 3, simConf.poolCount * 3);
 		meshData.vertexData.setDataUsage('DynamicDraw');
 		this.meshData = meshData;
 
 		var material = new Material(particleShader);
-		material.uniforms.alphakill = settings.alphakill.value;
-		material.blendState.blending = settings.blending.value;
+		material.uniforms.alphakill = simConf.alphakill.value;
+		material.blendState.blending = simConf.blending.value;
 		material.cullState.enabled = false;
 
 		material.depthState.write = false;
@@ -66,7 +65,7 @@ function (
 		var col = this.meshData.getAttributeBuffer(MeshData.COLOR);
 
 		// var color = this.settings.color.value;
-		for (var i = 0; i < this.settings.poolCount; i++) {
+		for (var i = 0; i < simConf.poolCount; i++) {
 			offset[6 * i + 0] = 0;
 			offset[6 * i + 1] = 0;
 
@@ -224,10 +223,6 @@ function (
 		if (this.entity.hidden) {
 			return;
 		}
-
-		var material = this.entity.meshRendererComponent.materials[0];
-		material.uniforms.alphakill = this.settings.alphakill.value;
-		material.blendState.blending = this.settings.blending.value;
 
 		this.pairs.length = null;
 		var tris = pairingFunction(this.pairs, particles, this.settings.distance.value);

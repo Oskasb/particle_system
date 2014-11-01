@@ -59,12 +59,12 @@ define([
 			return Math.random() * (max - min) + min;
 		}
 
-		TrailRenderer.prototype.init = function(goo, settings) {
+		TrailRenderer.prototype.init = function(goo, simConf, settings) {
 			this.settings = settings;
 
 			this.segmentCount = settings.segmentCount || 8;
 
-			settings.poolCount = this.topSettings.simulator_config.poolCount;
+			settings.poolCount = simConf.poolCount;
 
 			var attributeMap = MeshData.defaultMap([MeshData.POSITION, MeshData.TEXCOORD0, MeshData.COLOR]);
 			attributeMap.TILE = MeshData.createAttribute(4, 'Float');
@@ -75,8 +75,8 @@ define([
 			this.meshData = meshData;
 
 			var material = new Material(particleShader);
-			material.uniforms.alphakill = settings.alphakill.value;
-			material.blendState.blending = settings.blending.value;
+			material.uniforms.alphakill = simConf.alphakill.value;
+			material.blendState.blending = simConf.blending.value;
 			material.cullState.enabled = false;
 			material.depthState.write = false;
 			material.renderQueue = settings.renderqueue !== undefined ? settings.renderqueue : 3010;
@@ -371,10 +371,6 @@ define([
 			if (this.entity.hidden) {
 				return;
 			}
-
-			var material = this.entity.meshRendererComponent.materials[0];
-			material.uniforms.alphakill = this.settings.alphakill.value;
-			material.blendState.blending = this.settings.blending.value;
 
 			this.meshData.indexLengths = [this.lastAlive * (this.segmentCount - 1) * 6];
 			this.meshData.indexCount = this.lastAlive * (this.segmentCount - 1) * 6;

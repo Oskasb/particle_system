@@ -15,10 +15,10 @@ define([
 				},
 				{
 					"param":"count",
-					"value": 55,
+					"value": 85,
 					"type": "number",
 					"min": 1,
-					"max": 100
+					"max": 200
 				},
 				{
 					"param":"opacity",
@@ -43,7 +43,7 @@ define([
 				},
 				{
 					"param":"growthFactor",
-					"value": [0.01, 0.3],
+					"value": [0.02, 0.2],
 					"type": "range",
 					"min": 0.0,
 					"max": 10.0
@@ -64,28 +64,28 @@ define([
 				},
 				{
 					"param":"strength",
-					"value": 25,
+					"value": 15,
 					"type": "number",
 					"min": 0.0,
 					"max": 100.0
 				},
 				{
 					"param":"spread",
-					"value": 0.2,
+					"value": 0.5,
 					"type": "number",
 					"min": 0.0,
 					"max": 1.0
 				},
 				{
 					"param":"acceleration",
-					"value": 0.98,
+					"value": 0.96,
 					"type": "number",
 					"min": 0.0,
 					"max": 5.0
 				},
 				{
 					"param":"gravity",
-					"value": -10,
+					"value": -8,
 					"type": "number",
 					"min": -20.0,
 					"max": 20.0
@@ -114,7 +114,7 @@ define([
 				},
 				{
 					"param": "lifespan",
-					"value": [0.2, 3],
+					"value": [0.01, 4],
 					"type": "range",
 					"min": 0.0,
 					"max": 25.0
@@ -126,13 +126,25 @@ define([
 					"value": "box",
 					"type": "string"
 				},
+				"blending": {
+					"value": "AdditiveBlending",
+					"type": "option",
+					"values": ["AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "NoBlending", "CustomBlending"],
+					"texts": ["AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "NoBlending", "CustomBlending"]
+				},
+				"alphakill": {
+					"value": 0,
+					"type": "number",
+					"min": 0.0,
+					"max": 1.0
+				},
 				"followType": {
 					"value": "Mesh",
 					"type": "option",
 					"values": ["Mesh", "Joint"],
 					"texts": ["Mesh", "Joint"]
 				},
-				"poolCount": 200,
+				"poolCount": 400,
 
 				"spawner": {
 					"value": "meshSpawner",
@@ -178,20 +190,7 @@ define([
 							},
 							"value": true,
 							"type": "tile"
-						},
-						"blending": {
-							"value": "AdditiveBlending",
-							"type": "option",
-							"values": ["AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "NoBlending", "CustomBlending"],
-							"texts": ["AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "NoBlending", "CustomBlending"]
-						},
-						"alphakill": {
-							"value": 0,
-							"type": "number",
-							"min": 0.0,
-							"max": 1.0
-						},
-						"poolCount": 200
+						}
 					}
 				},
 				"TrailRenderer": {
@@ -227,19 +226,6 @@ define([
 							"value": true,
 							"type": "tile"
 						},
-						"blending": {
-							"value": "AdditiveBlending",
-							"type": "option",
-							"values": ["AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "NoBlending", "CustomBlending"],
-							"texts": ["AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "NoBlending", "CustomBlending"]
-						},
-						"alphakill": {
-							"value": 0,
-							"type": "number",
-							"min": 0.0,
-							"max": 1.0
-						},
-						"poolCount": 2,
 						"segmentCount": 5,
 						"width": {
 							"value": 1,
@@ -284,19 +270,6 @@ define([
 							"value": true,
 							"type": "tile"
 						},
-						"blending": {
-							"value": "AdditiveBlending",
-							"type": "option",
-							"values": ["AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "NoBlending", "CustomBlending"],
-							"texts": ["AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "NoBlending", "CustomBlending"]
-						},
-						"alphakill": {
-							"value": 0,
-							"type": "number",
-							"min": 0.0,
-							"max": 1.0
-						},
-						"poolCount": 2000,
 						"width": {
 							"value": 0.1,
 							"type": "number",
@@ -349,19 +322,6 @@ define([
 							"value": true,
 							"type": "tile"
 						},
-						"blending": {
-							"value": "AdditiveBlending",
-							"type": "option",
-							"values": ["AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "NoBlending", "CustomBlending"],
-							"texts": ["AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "NoBlending", "CustomBlending"]
-						},
-						"alphakill": {
-							"value": 0,
-							"type": "number",
-							"min": 0.0,
-							"max": 1.0
-						},
-						"poolCount": 2000,
 						"distance": {
 							"value": 0.2,
 							"type": "number"
