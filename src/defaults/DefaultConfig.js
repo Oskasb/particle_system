@@ -14,6 +14,13 @@ define([
 					"type": "color"
 				},
 				{
+					"param":"count",
+					"value": 55,
+					"type": "number",
+					"min": 1,
+					"max": 100
+				},
+				{
 					"param":"opacity",
 					"value": [0, 1],
 					"type": "range",
@@ -29,14 +36,21 @@ define([
 				},
 				{
 					"param":"size",
-					"value": [0.1, 0.3],
+					"value": [0.01, 0.1],
+					"type": "range",
+					"min": 0.0,
+					"max": 10.0
+				},
+				{
+					"param":"growthFactor",
+					"value": [0.01, 0.3],
 					"type": "range",
 					"min": 0.0,
 					"max": 10.0
 				},
 				{
 					"param":"growth",
-					"value": "growShrink",
+					"value": "posToNeg",
 					"type": "option",
 					"values":   ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"],
 					"texts":    ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
@@ -50,14 +64,14 @@ define([
 				},
 				{
 					"param":"strength",
-					"value": 45,
+					"value": 25,
 					"type": "number",
 					"min": 0.0,
 					"max": 100.0
 				},
 				{
 					"param":"spread",
-					"value": 0.04,
+					"value": 0.2,
 					"type": "number",
 					"min": 0.0,
 					"max": 1.0
@@ -82,13 +96,8 @@ define([
 					"type": "range",
 					"min": 0.0,
 					"max": 6.29
-				}, 				{
-					"param":"count",
-					"value": 5,
-					"type": "number",
-					"min": 1,
-					"max": 100
 				},
+
 				{
 					"param":"spin",
 					"value": "posToNeg",
@@ -105,7 +114,7 @@ define([
 				},
 				{
 					"param": "lifespan",
-					"value": [1, 4],
+					"value": [0.2, 3],
 					"type": "range",
 					"min": 0.0,
 					"max": 25.0
@@ -123,7 +132,7 @@ define([
 					"values": ["Mesh", "Joint"],
 					"texts": ["Mesh", "Joint"]
 				},
-				"poolCount": 1000,
+				"poolCount": 200,
 
 				"spawner": {
 					"value": "meshSpawner",
@@ -182,7 +191,7 @@ define([
 							"min": 0.0,
 							"max": 1.0
 						},
-						"poolCount": 500
+						"poolCount": 200
 					}
 				},
 				"TrailRenderer": {
@@ -194,17 +203,17 @@ define([
 						},
 						"tile": {
 							"enabled": {
-								"value": false,
+								"value": true,
 								"type": "boolean"
 							},
 							"tileCountX": {
-								"value": 5,
+								"value": 1,
 								"type": "number",
 								"step": 1,
 								"decimals": 0
 							},
 							"tileCountY": {
-								"value": 5,
+								"value": 1,
 								"type": "number",
 								"step": 1,
 								"decimals": 0
@@ -212,7 +221,7 @@ define([
 							"loopScale": {
 								"value": 1,
 								"type": "number",
-								"step": 0.1,
+								"step": 1,
 								"decimals": 1
 							},
 							"value": true,
@@ -230,14 +239,14 @@ define([
 							"min": 0.0,
 							"max": 1.0
 						},
-						"poolCount": 100,
-						"segmentCount": 20,
+						"poolCount": 2,
+						"segmentCount": 5,
 						"width": {
-							"value": 1.5,
+							"value": 1,
 							"type": "number"
 						},
 						"updateSpeed": {
-							"value": 10,
+							"value": 5,
 							"type": "number"
 						}
 					}

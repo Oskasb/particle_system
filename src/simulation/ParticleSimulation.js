@@ -66,6 +66,7 @@ define([
 
 
 		particle.size = randomBetween(simD.size[0], simD.size[1]);
+		particle.growthFactor = randomBetween(simD.growthFactor[0], simD.growthFactor[1]);
 		particle.growth = simD.growth;
 
 		particle.spin = simD.spin;
@@ -128,7 +129,7 @@ define([
 			// Note frame offset expects ideal frame (0.016) to make stable geometries
 			particle.progress = 1-((particle.lifeSpan - particle.frameOffset*0.016)  / particle.lifeSpanTotal);
 
-			particle.size += this.valueFromCurve(particle.progress, particle.growth) * deduct;
+			particle.size += particle.growthFactor * this.valueFromCurve(particle.progress, particle.growth) * deduct;
 			particle.rotation += particle.spinspeed * this.valueFromCurve(particle.progress, particle.spin) * deduct;
 
 			particle.velocity.muld(particle.acceleration, particle.acceleration, particle.acceleration);

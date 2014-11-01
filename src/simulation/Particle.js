@@ -29,6 +29,7 @@ function (
 		this.alpha = [[0, 0], [1, 1]];
 
 		this.size = 1;
+		this.growthFactor = 1;
 		this.growth = [[0, 1], [1, 0]];
 
 		this.acceleration = 1;

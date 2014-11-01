@@ -34,7 +34,7 @@ define([
 
 			this.trailDatas = [];
 			this.facingMode = 'Billboard'; //'Tangent'
-			// this.updateMode = 'Step'; //'Interpolate'
+			// 	this.updateMode = 'Step'; //'Interpolate'
 			this.updateMode = 'Interpolate'; //'Step'
 		}
 
@@ -131,7 +131,7 @@ define([
 					col[this.segmentCount * 8 * i + j * 8 + 3] = 1;
 					col[this.segmentCount * 8 * i + j * 8 + 4] = 1;
 					col[this.segmentCount * 8 * i + j * 8 + 5] = 1;
-					col[this.segmentCount * 8 * i + j * 8 + 6] = 1
+					col[this.segmentCount * 8 * i + j * 8 + 6] = 1;
 					col[this.segmentCount * 8 * i + j * 8 + 7] = 1;
 
 					texcoord[this.segmentCount * 4 * i + j * 4 + 0] = j / this.segmentCount;
@@ -154,8 +154,6 @@ define([
 
 		TrailRenderer.prototype.setTrailFront = function(trailData, position, tangent, tpf) {
 			var trail = null;
-
-			if (!trailData) return;
 
 			if (trailData.isReset) {
 				for (var i = 0; i < this.segmentCount; i++) {
@@ -188,7 +186,6 @@ define([
 
 		TrailRenderer.prototype.updateTrail = function(trailData, particle, camPos, index) {
 
-			if (!trailData) return;
 
 			var trailSegmentDatas = trailData.trailSegmentDatas;
 
@@ -227,11 +224,11 @@ define([
 
 					trailCamVec.set(trailVector).subv(camPos);
 					trailDirection.cross(trailCamVec);
-					trailDirection.normalize().mul(trailData.width * 0.5);
+					trailDirection.normalize().mul(trailData.width * particle.size);
 				} else if (trailSegmentData.tangent != null) {
-					trailDirection.set(trailSegmentData.tangent).mul(trailData.width * 0.5);
+					trailDirection.set(trailSegmentData.tangent).mul(trailData.width * particle.size);
 				} else {
-					trailDirection.set(trailData.width * 0.5, 0, 0);
+					trailDirection.set(trailData.width * particle.size, 0, 0);
 				}
 
 				pos[(index * this.segmentCount * 6) + 6 * i + 0] = trailVector.x - trailDirection.x;
@@ -242,7 +239,7 @@ define([
 				pos[(index * this.segmentCount * 6) + 6 * i + 4] = trailVector.y + trailDirection.y;
 				pos[(index * this.segmentCount * 6) + 6 * i + 5] = trailVector.z + trailDirection.z;
 
-				col[(index * this.segmentCount * 8) + 8 * i + 3] = particle.alpha;
+				col[(index * this.segmentCount * 8) + 8 * i + 3] = particle.color.data[3];
 			}
 		};
 
@@ -264,7 +261,7 @@ define([
 			}
 
 			var coldata = particle.color.data;
-			var w = trailData.width * 0.5;
+			var w = trailData.width * particle.size;
 			for (var i = 0; i < this.segmentCount; i++) {
 				var trailSegmentData = trailSegmentDatas[i];
 				var trailVector = trailSegmentData.interpolatedPosition;
@@ -326,7 +323,7 @@ define([
 				col[(index * this.segmentCount * 8) + 8 * i + 5] = coldata[1];
 				col[(index * this.segmentCount * 8) + 8 * i + 6] = coldata[2];
 
-				var alpha = i === 0 || i === this.segmentCount - 1 ? 0 : particle.alpha;
+				var alpha = i === 0 || i === this.segmentCount - 1 ? 0 : particle.color.data[3];
 				col[(index * this.segmentCount * 8) + 8 * i + 3] = alpha;
 				col[(index * this.segmentCount * 8) + 8 * i + 7] = alpha;
 			}
@@ -363,7 +360,7 @@ define([
 				return;
 			}
 
-			var trailData = this.trailDatas[this.renderedCount];
+			var trailData = this.trailDatas[particle.index];
 			this.setTrailFront(trailData, particle.position, null, tpf);
 			this.updateTrail(trailData, particle, Renderer.mainCamera.translation, this.renderedCount);
 
