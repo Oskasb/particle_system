@@ -22,21 +22,21 @@ define([
 				},
 				{
 					"param":"alpha",
-					"value": "oneToZero",
+					"value": "zeroOneZero",
 					"type": "option",
 					"values":   ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"],
 					"texts":    ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
 				},
 				{
 					"param":"size",
-					"value": [0.3, 0.3],
+					"value": [0.1, 0.3],
 					"type": "range",
 					"min": 0.0,
 					"max": 10.0
 				},
 				{
 					"param":"growth",
-					"value": "zeroToOne",
+					"value": "growShrink",
 					"type": "option",
 					"values":   ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"],
 					"texts":    ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
@@ -50,21 +50,14 @@ define([
 				},
 				{
 					"param":"strength",
-					"value": 1,
+					"value": 45,
 					"type": "number",
 					"min": 0.0,
-					"max": 10.0
+					"max": 100.0
 				},
 				{
 					"param":"spread",
-					"value": 1,
-					"type": "number",
-					"min": 0.0,
-					"max": 1.0
-				},
-				{
-					"param":"spread",
-					"value": 1,
+					"value": 0.04,
 					"type": "number",
 					"min": 0.0,
 					"max": 1.0
@@ -78,7 +71,7 @@ define([
 				},
 				{
 					"param":"gravity",
-					"value": 0,
+					"value": -10,
 					"type": "number",
 					"min": -20.0,
 					"max": 20.0
@@ -98,10 +91,17 @@ define([
 				},
 				{
 					"param":"spin",
-					"value": "oneToZero",
+					"value": "posToNeg",
 					"type": "option",
-					"values":["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"],
-					"texts": ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
+					"values":["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "posToNeg", "negToPos", "growShrink"],
+					"texts": ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "posToNeg", "negToPos", "growShrink"]
+				},
+				{
+					"param":"spinspeed",
+					"value": [-15, 15],
+					"type": "range",
+					"min": -40.0,
+					"max":  40.0
 				},
 				{
 					"param": "lifespan",
@@ -123,7 +123,7 @@ define([
 					"values": ["Mesh", "Joint"],
 					"texts": ["Mesh", "Joint"]
 				},
-				"poolCount": 100,
+				"poolCount": 1000,
 
 				"spawner": {
 					"value": "meshSpawner",

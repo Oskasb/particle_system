@@ -200,7 +200,7 @@ function (
 		var simD = sim.params.data;
 		var count = Math.ceil(simD.count * (this.availableParticles.length-1) / this.totalPool);
 	//	count = Math.min(count, this.availableParticles.length-1);
-		console.log("counts: ", count, this.availableParticles.length, this.totalPool);
+	//	console.log("counts: ", count, this.availableParticles.length, this.totalPool);
 
 		for (i = 0; i < count; i++) {
 			var particle = this.availableParticles.pop();

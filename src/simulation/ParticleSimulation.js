@@ -69,6 +69,7 @@ define([
 		particle.growth = simD.growth;
 
 		particle.spin = simD.spin;
+		particle.spinspeed = randomBetween(simD.spinspeed[0], simD.spinspeed[1]);
 		particle.rotation = randomBetween(simD.rotation[0], simD.rotation[1]);
 
 		particle.acceleration = simD.acceleration;
@@ -128,12 +129,13 @@ define([
 			particle.progress = 1-((particle.lifeSpan - particle.frameOffset*0.016)  / particle.lifeSpanTotal);
 
 			particle.size += this.valueFromCurve(particle.progress, particle.growth) * deduct;
-			particle.rotation += this.valueFromCurve(particle.progress, particle.spin) * deduct;
+			particle.rotation += particle.spinspeed * this.valueFromCurve(particle.progress, particle.spin) * deduct;
 
-			particle.velocity.muld(particle.acceleration*deduct, particle.acceleration*deduct, particle.acceleration*deduct);
+			particle.velocity.muld(particle.acceleration, particle.acceleration, particle.acceleration);
+			particle.velocity.add_d(0, particle.gravity*deduct, 0);
 
-			particle.velocity.add_d(0, particle.gravity * deduct, 0);
-			this.calcVec.setv(particle.velocity).muld(deduct, deduct, deduct);
+			this.calcVec.set(particle.velocity)
+			this.calcVec.muld(deduct, deduct, deduct);
 			particle.position.addv(this.calcVec);
 
 			particle.color.data[3] = particle.opacity * this.valueFromCurve(particle.progress, particle.alpha);

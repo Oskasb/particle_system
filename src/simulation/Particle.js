@@ -35,6 +35,7 @@ function (
 		this.gravity = 0;
 
 		this.rotation = 0;
+		this.spinspeed = 0;
 		this.spin = [[0, 1], [1, 0]];
 
 		this.lifeSpan = 0;
