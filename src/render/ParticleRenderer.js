@@ -19,10 +19,19 @@ function (
 		this.settings = null;
 		this.entity = null;
 		this.meshData = null;
+		this.sprites = {};
 	}
 
 	ParticleRenderer.prototype.init = function (goo, simConf, settings) {
+
+
+
 		this.settings = settings;
+		this.atlasConf = simConf.atlas;
+
+		for (var i = 0; i < this.atlasConf.sprites.length; i++) {
+			this.sprites[this.atlasConf.sprites[i].id] = this.atlasConf.sprites[i];
+		}
 
 		var attributeMap = MeshData.defaultMap([MeshData.POSITION, MeshData.COLOR]);
 		attributeMap.DATA = MeshData.createAttribute(2, 'Float');
@@ -46,7 +55,7 @@ function (
 
 		entity.skip = true;
 		var textureCreator = new TextureCreator();
-		var texture = textureCreator.loadTexture2D(this.settings.textureUrl.value, {
+		var texture = textureCreator.loadTexture2D(simConf.atlas.textureUrl.value, {
 			wrapS: 'EdgeClamp',
 			wrapT: 'EdgeClamp'
 		}, function() {
@@ -57,7 +66,7 @@ function (
 		var offset = this.meshData.getAttributeBuffer('OFFSET');
 		var tile = this.meshData.getAttributeBuffer('TILE');
 		var indices = this.meshData.getIndexBuffer();
-		for (var i = 0; i < simConf.poolCount; i++) {
+		for (i = 0; i < simConf.poolCount; i++) {
 			offset[8 * i + 0] = -1;
 			offset[8 * i + 1] = -1;
 
@@ -116,23 +125,25 @@ function (
 		this.data = this.meshData.getAttributeBuffer('DATA');
 		this.tile = this.meshData.getAttributeBuffer('TILE');
 
+
+
 		this.tileInfo = this.settings.tile;
-		this.isTiled = this.tileInfo !== undefined && this.tileInfo.enabled.value;
-		this.tileCountX = 1;
-		this.tileCountY = 1;
+	//	this.isTiled = this.tileInfo !== undefined && this.tileInfo.enabled.value;
+		this.tileCountX = this.atlasConf.textureUrl.tilesX;
+		this.tileCountY = this.atlasConf.textureUrl.tilesY;
 		this.loopScale = 1;
-		if (this.isTiled) {
-			this.tileCountX = this.tileInfo.tileCountX.value;
-			this.tileCountY = this.tileInfo.tileCountY.value;
-			this.loopScale  = this.tileInfo.loopScale.value;
-		}
+	//	if (this.isTiled) {
+	//		this.tileCountX = this.tileInfo.tileCountX.value;
+	//		this.tileCountY = this.tileInfo.tileCountY.value;
+	//		this.loopScale  = this.tileInfo.loopScale.value;
+	//	}
 		this.scaleX = 1 / this.tileCountX;
 		this.scaleY = 1 / this.tileCountY;
-		this.totalTileCount = this.tileCountX * this.tileCountY;
-		this.tileFrameCount = this.totalTileCount;
-		if (this.isTiled && this.tileInfo.frameCount) {
-			this.tileFrameCount = this.tileInfo.frameCount;
-		}
+	//	this.totalTileCount = this.tileCountX * this.tileCountY;
+	//	this.tileFrameCount = this.totalTileCount;
+	//	if (this.isTiled && this.tileInfo.frameCount) {
+	//		this.tileFrameCount = this.tileInfo.frameCount;
+	//	}
 
 		this.lastAlive = 0;
 
@@ -150,19 +161,19 @@ function (
 		}
 		var j, i, l;
 		i = this.renderedCount;
-		if (this.isTiled) {
-			var tileTime = (((particle.lifeSpan / particle.lifeSpanTotal) * this.loopScale) % 1) * this.totalTileCount;
-			tileTime = Math.floor(tileTime) % this.tileFrameCount;
-			var offsetX = (tileTime % this.tileCountX) / this.tileCountX;
-			var offsetY = 1 - this.scaleY - Math.floor(tileTime / this.tileCountX) / this.tileCountY;
+
+		particle.setTileInfo(this.sprites[particle.sprite], this.scaleX, this.scaleY);
+		particle.updateAtlasOffsets(this.loopScale);
+	//	if (this.isTiled) {
+
 
 			for (j = 0; j < 4; j++) {
-				this.tile[(4 * 4 * i + 0) + 4 * j] = offsetX;
-				this.tile[(4 * 4 * i + 1) + 4 * j] = offsetY;
-				this.tile[(4 * 4 * i + 2) + 4 * j] = this.scaleX;
-				this.tile[(4 * 4 * i + 3) + 4 * j] = this.scaleY;
+				this.tile[(4 * 4 * i + 0) + 4 * j] = particle.offsetX;
+				this.tile[(4 * 4 * i + 1) + 4 * j] = particle.offsetY;
+				this.tile[(4 * 4 * i + 2) + 4 * j] = particle.scaleX;
+				this.tile[(4 * 4 * i + 3) + 4 * j] = particle.scaleY;
 			}
-		}
+	//	}
 
 		var posdata = particle.position.data;
 		var coldata = particle.color.data;

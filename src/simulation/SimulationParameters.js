@@ -25,7 +25,7 @@ define(function() {
 		var data = {};
 
 		for (var i = 0; i < simParams.length; i++) {
-			if (simParams[i].type == "option") {
+			if (simParams[i].type == "curve") {
 				data[simParams[i].param] = curves[simParams[i].value];
 			} else {
 				data[simParams[i].param] = simParams[i].value;

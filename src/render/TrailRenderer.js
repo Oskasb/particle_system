@@ -31,7 +31,7 @@ define([
 			this.meshData = null;
 
 			this.segmentCount = 0;
-
+			this.sprites = {};
 			this.trailDatas = [];
 			this.facingMode = 'Billboard'; //'Tangent'
 			// 	this.updateMode = 'Step'; //'Interpolate'
@@ -61,6 +61,15 @@ define([
 
 		TrailRenderer.prototype.init = function(goo, simConf, settings) {
 			this.settings = settings;
+
+			this.atlasConf = simConf.atlas;
+
+			for (var i = 0; i < this.atlasConf.sprites.length; i++) {
+				this.sprites[this.atlasConf.sprites[i].id] = this.atlasConf.sprites[i];
+			}
+
+			this.scaleX = 1 / this.atlasConf.textureUrl.tilesX;
+			this.scaleY = 1 / this.atlasConf.textureUrl.tilesY;
 
 			this.segmentCount = settings.segmentCount || 8;
 
@@ -98,13 +107,15 @@ define([
 
 			entity.skip = true;
 			var textureCreator = new TextureCreator();
-			var texture = textureCreator.loadTexture2D(settings.textureUrl.value, {
+			var texture = textureCreator.loadTexture2D(simConf.atlas.textureUrl.value, {
 				wrapS: 'EdgeClamp',
 				wrapT: 'EdgeClamp'
 			}, function() {
 				entity.skip = false;
 			});
 			material.setTexture('PARTICLE_MAP', texture);
+
+
 
 			var col = this.meshData.getAttributeBuffer(MeshData.COLOR);
 			var texcoord = this.meshData.getAttributeBuffer(MeshData.TEXCOORD0);
@@ -245,9 +256,10 @@ define([
 
 		TrailRenderer.prototype.updateInterpolate = function(trailData, particle, camPos, index) {
 			var trailSegmentDatas = trailData.trailSegmentDatas;
-
+			particle.setTrailInfo(this.sprites[particle.trailSprite], this.scaleX, this.scaleY);
 			var pos = this.meshData.getAttributeBuffer(MeshData.POSITION);
 			var col = this.meshData.getAttributeBuffer(MeshData.COLOR);
+			var tile = this.meshData.getAttributeBuffer('TILE');
 
 			for (var i = 0; i < this.segmentCount; i++) {
 				var trailSegmentData = trailSegmentDatas[i];
@@ -260,8 +272,10 @@ define([
 				}
 			}
 
+
+
 			var coldata = particle.color.data;
-			var w = trailData.width * particle.size;
+			var w = particle.size * particle.trailWidth;
 			for (var i = 0; i < this.segmentCount; i++) {
 				var trailSegmentData = trailSegmentDatas[i];
 				var trailVector = trailSegmentData.interpolatedPosition;
@@ -307,6 +321,17 @@ define([
 				} else {
 					trailDirection.setd(w, 0, 0);
 				}
+
+
+				tile[(index * this.segmentCount * 8)+ i * 8 + 0] = particle.trailOffsetX; //offset u
+				tile[(index * this.segmentCount * 8)+ i * 8 + 1] = particle.trailOffsetY; //offset w
+				tile[(index * this.segmentCount * 8)+ i * 8 + 2] = this.scaleX; //scale u
+				tile[(index * this.segmentCount * 8)+ i * 8 + 3] = this.scaleY; //scale w
+				tile[(index * this.segmentCount * 8)+ i * 8 + 4] = particle.trailOffsetX; //offset u
+				tile[(index * this.segmentCount * 8)+ i * 8 + 5] = particle.trailOffsetY; //offset w
+				tile[(index * this.segmentCount * 8)+ i * 8 + 6] = this.scaleX; //scale u
+				tile[(index * this.segmentCount * 8)+ i * 8 + 7] = this.scaleY; //scale w
+
 
 				pos[(index * this.segmentCount * 6) + 6 * i + 0] = trailVector.data[0] - trailDirection.data[0];
 				pos[(index * this.segmentCount * 6) + 6 * i + 1] = trailVector.data[1] - trailDirection.data[1];

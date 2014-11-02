@@ -45,46 +45,11 @@ define([
 		this.recover.push(particle);
 	};
 
-	function randomBetween(min, max) {
-		return Math.random() * (max - min) + min;
-	}
 
 
 	ParticleSimulation.prototype.includeParticle = function(particle, ratio) {
-		var simD = this.params.data;
-		particle.position.x = this.params.position.x + this.params.normal.x*ratio;
-		particle.position.y = this.params.position.y + this.params.normal.y*ratio;
-		particle.position.z = this.params.position.z + this.params.normal.z*ratio;
-
-		particle.velocity.x = simD.strength*((Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*this.params.normal.x);
-		particle.velocity.y = simD.strength*((Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*this.params.normal.y);
-		particle.velocity.z = simD.strength*((Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*this.params.normal.z);
-
-		particle.color.set(simD.color);
-		particle.opacity = randomBetween(simD.opacity[0], simD.opacity[1]);
-		particle.alpha = simD.alpha;
-
-
-		particle.size = randomBetween(simD.size[0], simD.size[1]);
-		particle.growthFactor = randomBetween(simD.growthFactor[0], simD.growthFactor[1]);
-		particle.growth = simD.growth;
-
-		particle.spin = simD.spin;
-		particle.spinspeed = randomBetween(simD.spinspeed[0], simD.spinspeed[1]);
-		particle.rotation = randomBetween(simD.rotation[0], simD.rotation[1]);
-
-		particle.acceleration = simD.acceleration;
-		particle.gravity = simD.gravity;
-
-		particle.progress = 0;
-		particle.lifeSpan = randomBetween(simD.lifespan[0], simD.lifespan[1]);
-		particle.lifeSpanTotal = particle.lifeSpan;
-
-		particle.frameOffset = ratio;
-
-		particle.dead = false;
+		particle.joinSimulation(this.params, ratio);
 		this.particles.push(particle);
-
 	};
 
 	ParticleSimulation.prototype.getInterpolatedInCurveAboveIndex = function(value, curve, index) {

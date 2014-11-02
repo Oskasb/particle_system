@@ -22,7 +22,7 @@ define([
 				},
 				{
 					"param":"opacity",
-					"value": [0, 1],
+					"value": [0.8, 1],
 					"type": "range",
 					"min": 0.0,
 					"max": 1.0
@@ -30,7 +30,7 @@ define([
 				{
 					"param":"alpha",
 					"value": "zeroOneZero",
-					"type": "option",
+					"type": "curve",
 					"values":   ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"],
 					"texts":    ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
 				},
@@ -51,9 +51,9 @@ define([
 				{
 					"param":"growth",
 					"value": "posToNeg",
-					"type": "option",
-					"values":   ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"],
-					"texts":    ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
+					"type": "curve",
+					"values":["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "posToNeg", "negToPos", "growShrink"],
+			   		"texts": ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "posToNeg", "negToPos", "growShrink"]
 				},
 				{
 					"param":"stretch",
@@ -101,7 +101,7 @@ define([
 				{
 					"param":"spin",
 					"value": "posToNeg",
-					"type": "option",
+					"type": "curve",
 					"values":["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "posToNeg", "negToPos", "growShrink"],
 					"texts": ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "posToNeg", "negToPos", "growShrink"]
 				},
@@ -118,9 +118,88 @@ define([
 					"type": "range",
 					"min": 0.0,
 					"max": 25.0
+				},
+				{
+					"param": "sprite",
+					"value": "dot_seq",
+					"type": "option",
+					"values":["dot", "dot_seq","spark_seq", "trail_dot", "flaredot", "sparks"],
+					"texts": ["dot", "dot_seq","spark_seq", "trail_dot", "flaredot", "sparks"]
+				},
+				{
+					"param": "loopcount",
+					"value": 5,
+					"type": "number",
+					"min": 1,
+					"max": 100.0
+				},
+				{
+					"param": "trailsprite",
+					"value": "tail",
+					"type": "option",
+					"values":["dot","tail", "bluetrails", "wave", "waves", "dot_seq","spark_seq", "trail_dot", "flaredot", "sparks"],
+					"texts": ["dot","tail", "bluetrails", "wave", "waves", "dot_seq","spark_seq", "trail_dot", "flaredot", "sparks"]
+				},
+				{
+					"param": "trailwidth",
+					"value": 0.2,
+					"type": "number",
+					"min": 0,
+					"max": 10.0
 				}
+
 			],
 			"simulator_config":{
+				"atlas": {
+					"textureUrl": {
+						"value": "./configs/gui/images/bin/test/particle_atlas.png",
+						"type": "texture",
+						"tilesX":8,
+						"tilesY":8
+					},
+					"sprites":[
+						{
+							"id":"dot",
+							"tiles":[[2, 4]]
+						},
+						{
+							"id":"tail",
+							"tiles":[[0, 5]]
+						},
+						{
+							"id":"bluetrails",
+							"tiles":[[2, 2]]
+						},
+						{
+							"id":"waves",
+							"tiles":[[0, 7]]
+						},
+						{
+							"id":"wave",
+							"tiles":[[0, 6]]
+						},
+						{
+							"id":"sparks",
+							"tiles":[[3, 0]]
+						},
+						{
+							"id":"dot_seq",
+							"tiles":[[0, 4],[2, 4],[1, 4], [3, 4],[2, 4], [4, 4]]
+						},
+						{
+							"id":"spark_seq",
+							"tiles":[[0, 3],[1, 3],[2, 3], [1, 3]]
+						},
+						{
+							"id":"trail_dot",
+							"tiles":[[2, 2],[3, 2],[4, 1], [5, 2], [6, 0], [7, 2], [8, 1]]
+						},
+						{
+							"id":"flaredot",
+							"tiles":[[4, 0]]
+						}
+					]
+				},
 
 				"follow": {
 					"value": "box",
@@ -167,19 +246,19 @@ define([
 						},
 						"tile": {
 							"enabled": {
-								"value": false,
+								"value": true,
 								"type": "boolean"
 							},
 							"tileCountX": {
 								"value": 5,
 								"type": "number",
-								"step": 1,
+								"step": 2,
 								"decimals": 0
 							},
 							"tileCountY": {
 								"value": 5,
 								"type": "number",
-								"step": 1,
+								"step": 2,
 								"decimals": 0
 							},
 							"loopScale": {
