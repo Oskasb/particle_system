@@ -10,7 +10,7 @@ define([
 			"simulation_params":[
 				{
 					"param":"color",
-					"value": [1, 1, 1, 1],
+					"value": [0.6, 0.7, 1, 1],
 					"type": "color"
 				},
 				{
@@ -22,7 +22,7 @@ define([
 				},
 				{
 					"param":"opacity",
-					"value": [0.8, 1],
+					"value": [0.6, 1],
 					"type": "range",
 					"min": 0.0,
 					"max": 1.0
@@ -43,7 +43,7 @@ define([
 				},
 				{
 					"param":"growthFactor",
-					"value": [0.02, 0.2],
+					"value": [0.02, 0.6],
 					"type": "range",
 					"min": 0.0,
 					"max": 10.0
@@ -71,14 +71,14 @@ define([
 				},
 				{
 					"param":"spread",
-					"value": 0.5,
+					"value": 0.4,
 					"type": "number",
 					"min": 0.0,
 					"max": 1.0
 				},
 				{
 					"param":"acceleration",
-					"value": 0.96,
+					"value": 0.98,
 					"type": "number",
 					"min": 0.0,
 					"max": 5.0
