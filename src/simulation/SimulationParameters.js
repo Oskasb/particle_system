@@ -25,18 +25,22 @@ define(function() {
 		var data = {};
 
 		for (var i = 0; i < simParams.length; i++) {
-			if (simParams[i].type == "curve") {
-				data[simParams[i].param] = curves[simParams[i].value];
+
+			var value;
+
+			if (effectData[simParams[i].param]) {
+				value = effectData[simParams[i].param];
 			} else {
-				data[simParams[i].param] = simParams[i].value;
+				value = simParams[i].value
+			}
+
+			if (simParams[i].type == "curve") {
+				data[simParams[i].param] = curves[value];
+			} else {
+				data[simParams[i].param] = value;
 			}
 		}
 
-		if (effectData) {
-			for (var key in effectData) {
-				data[key] = effectData[key];
-			}
-		}
 
 		data.effectCount = data.count;
 		return data;

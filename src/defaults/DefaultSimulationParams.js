@@ -8,7 +8,7 @@ define({
 		},
 		{
 			"param":"count",
-			"value": 85,
+			"value": 485,
 			"type": "number",
 			"min": 1,
 			"max": 200
@@ -22,7 +22,7 @@ define({
 		},
 		{
 			"param":"alpha",
-			"value": "zeroOneZero",
+			"value": "oneToZero",
 			"type": "curve",
 			"values":   ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"],
 			"texts":    ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
@@ -64,7 +64,7 @@ define({
 		},
 		{
 			"param":"spread",
-			"value": 0.4,
+			"value": 0.94,
 			"type": "number",
 			"min": 0.0,
 			"max": 1.0
@@ -140,6 +140,5 @@ define({
 			"min": 0,
 			"max": 10.0
 		}
-
-	],
-})
+	]
+});

@@ -12,6 +12,7 @@ function (
 	function Particle(idx) {
 		this.index = idx;
 		this.position 	= new Vector3();
+		this.direction = new Vector3();
 		this.velocity 	= new Vector3();
 		this.color 		= new Vector4();
 
@@ -65,9 +66,15 @@ function (
 		this.position.y = simParams.position.y + simParams.normal.y*ratio;
 		this.position.z = simParams.position.z + simParams.normal.z*ratio;
 
-		this.velocity.x = simD.strength*((Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*simParams.normal.x);
-		this.velocity.y = simD.strength*((Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*simParams.normal.y);
-		this.velocity.z = simD.strength*((Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*simParams.normal.z);
+		this.direction.x = (Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*simParams.normal.x;
+		this.direction.y = (Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*simParams.normal.y;
+		this.direction.z = (Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*simParams.normal.z;
+
+		this.direction.normalize();
+
+		this.velocity.x = simD.strength*this.direction.x;
+		this.velocity.y = simD.strength*this.direction.y;
+		this.velocity.z = simD.strength*this.direction.z;
 
 		this.sprite = simD.sprite;
 		this.trailSprite = simD.trailsprite;
@@ -76,7 +83,6 @@ function (
 		this.color.set(simD.color);
 		this.opacity = randomBetween(simD.opacity[0], simD.opacity[1]);
 		this.alpha = simD.alpha;
-
 
 		this.size = randomBetween(simD.size[0], simD.size[1]);
 		this.growthFactor = randomBetween(simD.growthFactor[0], simD.growthFactor[1]);

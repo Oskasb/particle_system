@@ -25,7 +25,7 @@ function (
 		return this.atlases[simSettings.atlas];
 	};
 
-	ParticleSystem.prototype.add = function (simConfigs, rendererConfigs, atlasConfigs) {
+	ParticleSystem.prototype.addConfiguredSystems = function (simConfigs, rendererConfigs, atlasConfigs) {
 		this.attachAtlases(atlasConfigs);
 		for (var i = 0; i < simConfigs.simulators.length; i++) {
 			var simSettings = simConfigs.simulators[i];

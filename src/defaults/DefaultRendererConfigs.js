@@ -2,10 +2,12 @@ define({
 	"renderers":[
 		{
 			"id":"ParticleRenderer",
+			"script":"ParticleRenderer",
 			"settings": {}
 		},
 		{
 			"id":"TrailRenderer",
+			"script":"TrailRenderer",
 			"settings": {
 				"segmentCount": 5,
 				"width": {
@@ -20,6 +22,7 @@ define({
 		},
 		{
 			"id":"LineRenderer",
+			"script":"LineRenderer",
 			"settings": {
 				"width": {
 					"value": 0.1,
@@ -42,6 +45,7 @@ define({
 		},
 		{
 			"id":"TriangleRenderer",
+			"script":"TriangleRenderer",
 			"settings": {
 				"distance": {
 					"value": 0.2,

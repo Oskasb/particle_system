@@ -109,7 +109,7 @@ function (
 		}
     */
 		this.renderers = [];
-		settings.renderers = settings.renderers || {};
+		settings.renderers = settings.renderers || [];
 
 		for (i = 0; i < this.rendererConfigs.renderers.length; i++) {
 			this.rendererSettings[this.rendererConfigs.renderers[i].id] = this.rendererConfigs.renderers[i];
@@ -156,7 +156,7 @@ function (
 
 	ParticleSimulator.prototype.initRenderer = function(rendererName, spriteAtlas) {
 		var rendererConf = this.rendererSettings[rendererName];
-		var renderer = createRenderer(rendererName);
+		var renderer = createRenderer(rendererConf.script);
 		renderer.topSettings = this.settings;
 		renderer.globalSettings = rendererConf;
 		this.renderers.push(renderer);
