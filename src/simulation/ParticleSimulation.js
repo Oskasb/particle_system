@@ -2,11 +2,13 @@
 
 define([
 	'goo/math/Vector3',
-	'particle_system/simulation/SimulationParameters'
+	'particle_system/simulation/SimulationParameters',
+	'particle_system/defaults/DefaultSimulationParams'
 
 ], function(
 	Vector3,
-	SimulationParameters
+	SimulationParameters,
+    DefaultSimulationParams
 	) {
 
 	var ParticleSimulation = function() {
@@ -22,8 +24,7 @@ define([
 
 	ParticleSimulation.prototype.initSimulation = function(posVec, normVec, defaultSettings, effectData) {
 		this.resetSimulation();
-		this.settings = defaultSettings;
-		this.params = new SimulationParameters(posVec, normVec, defaultSettings, effectData);
+		this.params = new SimulationParameters(posVec, normVec, DefaultSimulationParams.particle_params, effectData);
 		this.calcVec = new Vector3();
 		this.active = true;
 	};

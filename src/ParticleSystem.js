@@ -9,12 +9,24 @@ function (
 
 	function ParticleSystem(goo) {
 		this.goo = goo;
+		this.atlases = {};
 		this.simulators = {};
 		this.groups = {};
 	}
 
-	ParticleSystem.prototype.add = function (settings) {
-		var simulator = new ParticleSimulator(this.goo, settings);
+	ParticleSystem.prototype.attachAtlases = function (atlasConfigs) {
+		for (var i = 0; i < atlasConfigs.atlases.length; i++) {
+			this.atlases[atlasConfigs.atlases[i].id] = atlasConfigs.atlases[i];
+		}
+	};
+
+	ParticleSystem.prototype.getAtlasForSetting = function(settings) {
+		return this.atlases[settings.simulator_config.atlas];
+	};
+
+	ParticleSystem.prototype.add = function (settings, atlasConfigs) {
+		this.attachAtlases(atlasConfigs);
+		var simulator = new ParticleSimulator(this.goo, settings, this.getAtlasForSetting(settings));
 		this.simulators[settings.id] = simulator;
 	};
 

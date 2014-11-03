@@ -59,10 +59,10 @@ define([
 			return Math.random() * (max - min) + min;
 		}
 
-		TrailRenderer.prototype.init = function(goo, simConf, settings) {
+		TrailRenderer.prototype.init = function(goo, simConf, settings, spriteAtlas) {
 			this.settings = settings;
 
-			this.atlasConf = simConf.atlas;
+			this.atlasConf = spriteAtlas;
 
 			for (var i = 0; i < this.atlasConf.sprites.length; i++) {
 				this.sprites[this.atlasConf.sprites[i].id] = this.atlasConf.sprites[i];
@@ -107,7 +107,7 @@ define([
 
 			entity.skip = true;
 			var textureCreator = new TextureCreator();
-			var texture = textureCreator.loadTexture2D(simConf.atlas.textureUrl.value, {
+			var texture = textureCreator.loadTexture2D(this.atlasConf.textureUrl.value, {
 				wrapS: 'EdgeClamp',
 				wrapT: 'EdgeClamp'
 			}, function() {

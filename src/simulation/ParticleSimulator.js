@@ -50,7 +50,7 @@ function (
 		}
 	}
 
-	function ParticleSimulator(goo, settings) {
+	function ParticleSimulator(goo, settings, spriteAtlas) {
 		this.goo = goo;
 		this.settings = settings;
 		this.meshPositions = [];
@@ -109,7 +109,7 @@ function (
 		settings.renderers = settings.renderers || {};
 
 		for (var rendererName in settings.renderers) {
-			this.initRenderer(rendererName);
+			this.initRenderer(rendererName, spriteAtlas);
 		}
 
 		this.visible = true;
@@ -146,14 +146,14 @@ function (
 		this.behaviors[nr] = createSpawner(rendererName);
 	};
 
-	ParticleSimulator.prototype.initRenderer = function(rendererName) {
+	ParticleSimulator.prototype.initRenderer = function(rendererName, spriteAtlas) {
 		var rendererConf = this.settings.renderers[rendererName];
 		var renderer = createRenderer(rendererName);
 		renderer.topSettings = this.settings;
 		renderer.globalSettings = rendererConf;
 		this.renderers.push(renderer);
 		if (renderer.init) {
-			renderer.init(this.goo, this.settings.simulator_config, rendererConf.settings);
+			renderer.init(this.goo, this.settings.simulator_config, rendererConf.settings, spriteAtlas);
 			renderer.setVisible(rendererConf.enabled);
 		}
 	};
