@@ -24,9 +24,9 @@ function (
 		return this.atlases[settings.simulator_config.atlas];
 	};
 
-	ParticleSystem.prototype.add = function (settings, atlasConfigs) {
+	ParticleSystem.prototype.add = function (settings, rendererConfigs, atlasConfigs) {
 		this.attachAtlases(atlasConfigs);
-		var simulator = new ParticleSimulator(this.goo, settings, this.getAtlasForSetting(settings));
+		var simulator = new ParticleSimulator(this.goo, settings, rendererConfigs, this.getAtlasForSetting(settings));
 		this.simulators[settings.id] = simulator;
 	};
 
