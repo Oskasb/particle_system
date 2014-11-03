@@ -26,8 +26,8 @@ define([
 		//	this.particleSystem.wakeParticle(id)
 		};
 
-		ParticlesAPI.prototype.createParticleSystem = function(systemConfig, rendererConfigs, atlasConfigs) {
-			this.particleSystem.add(systemConfig, rendererConfigs,atlasConfigs)
+		ParticlesAPI.prototype.createParticleSystem = function(systemConfigs, rendererConfigs, atlasConfigs) {
+			this.particleSystem.add(systemConfigs, rendererConfigs,atlasConfigs)
 		};
 
 		ParticlesAPI.prototype.removeParticleSystem = function(id) {

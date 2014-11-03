@@ -58,7 +58,7 @@ function (
 		this.meshPositions = [];
 		this.simulations = [];
 
-		this.totalPool = this.settings.simulator_config.poolCount;
+		this.totalPool = this.settings.poolCount;
 
 	/*
 	// move to behaviour logic...
@@ -116,8 +116,8 @@ function (
 		}
 
 
-		for (i = 0; i < settings.simulator_config.renderers.length; i++) {
-			this.initRenderer(settings.simulator_config.renderers[i], spriteAtlas);
+		for (i = 0; i < settings.renderers.length; i++) {
+			this.initRenderer(settings.renderers[i], spriteAtlas);
 		}
 
 		this.setVisible(true);
@@ -161,7 +161,7 @@ function (
 		renderer.globalSettings = rendererConf;
 		this.renderers.push(renderer);
 		if (renderer.init) {
-			renderer.init(this.goo, this.settings.simulator_config, rendererConf.settings, spriteAtlas);
+			renderer.init(this.goo, this.settings, rendererConf.settings, spriteAtlas);
 		}
 	};
 

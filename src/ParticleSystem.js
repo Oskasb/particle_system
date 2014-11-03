@@ -10,6 +10,7 @@ function (
 	function ParticleSystem(goo) {
 		this.goo = goo;
 		this.atlases = {};
+		this.simData = {};
 		this.simulators = {};
 		this.groups = {};
 	}
@@ -20,14 +21,17 @@ function (
 		}
 	};
 
-	ParticleSystem.prototype.getAtlasForSetting = function(settings) {
-		return this.atlases[settings.simulator_config.atlas];
+	ParticleSystem.prototype.getAtlasForSetting = function(simSettings) {
+		return this.atlases[simSettings.atlas];
 	};
 
-	ParticleSystem.prototype.add = function (settings, rendererConfigs, atlasConfigs) {
+	ParticleSystem.prototype.add = function (simConfigs, rendererConfigs, atlasConfigs) {
 		this.attachAtlases(atlasConfigs);
-		var simulator = new ParticleSimulator(this.goo, settings, rendererConfigs, this.getAtlasForSetting(settings));
-		this.simulators[settings.id] = simulator;
+		for (var i = 0; i < simConfigs.simulators.length; i++) {
+			var simSettings = simConfigs.simulators[i];
+			var simulator = new ParticleSimulator(this.goo, simSettings, rendererConfigs, this.getAtlasForSetting(simSettings));
+			this.simulators[simSettings.id] = simulator;
+		}
 	};
 
 	ParticleSystem.prototype.spawnParticleSimulation = function(id, position, normal, effectData) {
