@@ -34,8 +34,8 @@ define(function() {
 				value = simParams[i].value
 			}
 
-			if (simParams[i].type == "curve") {
-				data[simParams[i].param] = curves[value];
+			if (simParams[i].type == "curve" && typeof(value) == 'string') {
+                data[simParams[i].param] = curves[value];
 			} else {
 				data[simParams[i].param] = value;
 			}

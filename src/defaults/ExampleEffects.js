@@ -4,12 +4,12 @@ define({
 			"id":"firework_blue",
 			"effect_data":{
 				"color":[0.4,0.4, 1, 1],
-				"count":100,
+				"count":40,
 				"opacity":[0.4, 1],
-				"alpha":"oneToZero",
-				"size":[0.02, 0.2],
+				"alpha":[[0,1], [0.15, 0], [0.3, 1],[0.5, 0], [0.7, 1] ,[1,0]],
+				"size":[0.2, 0.22],
 				"growthFactor":[0.01, 0.7],
-				"growth":"posToNeg",
+				"growth":[[0, -1], [0.05, 1], [0.3, 2],[0.45, -2], [0.6, 1], [0.75, -1], [0.9,1 ], [1,0]],
 				"stretch":1,
 				"strength":12,
 				"spread":0.6,
@@ -29,7 +29,7 @@ define({
 			"id":"firework_red",
 			"effect_data":{
 				"color":[1,0.4, 0.4, 1],
-				"count":90,
+				"count":50,
 				"opacity":[0.4, 1],
 				"alpha":"oneToZero",
 				"size":[0.02, 0.2],
@@ -54,7 +54,7 @@ define({
 			"id":"firework_green",
 			"effect_data":{
 				"color":[0.4, 1, 0.4, 1],
-				"count":200,
+				"count":60,
 				"opacity":[0.4, 1],
 				"alpha":"oneToZero",
 				"size":[0.02, 0.2],
@@ -79,7 +79,7 @@ define({
 			"id":"firework_cone_yellow",
 			"effect_data":{
 				"color":[0.8,0.8, 0.3, 1],
-				"count":50,
+				"count":30,
 				"opacity":[0.7, 1],
 				"alpha":"oneToZero",
 				"size":[0.02, 0.2],

@@ -7,7 +7,7 @@ define({
 				"ParticleRenderer",
 				"TrailRenderer"
 			],
-			"poolCount": 2000,
+			"poolCount": 1000,
 			"blending": {
 				"value": "AdditiveBlending",
 				"type": "option",
@@ -28,7 +28,7 @@ define({
 			"renderers": [
 				"ParticleRenderer"
 			],
-			"poolCount": 4000,
+			"poolCount": 2000,
 			"blending": {
 				"value": "AdditiveBlending",
 				"type": "option",
@@ -49,7 +49,7 @@ define({
 			"renderers": [
 				"TrailRenderer"
 			],
-			"poolCount": 2000,
+			"poolCount": 1000,
 			"blending": {
 				"value": "AdditiveBlending",
 				"type": "option",
