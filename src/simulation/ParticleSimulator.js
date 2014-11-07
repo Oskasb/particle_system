@@ -137,7 +137,7 @@ function (
 		return sim;
 	};
 
-	ParticleSimulator.prototype.addEffectSimulation = function(position, normal, effectData) {
+	ParticleSimulator.prototype.addEffectSimulation = function(position, normal, effectData, callbacks) {
 
 		var sim = this.getAvailableSimulation();
 
@@ -147,7 +147,7 @@ function (
 		}
 
 		sim.initSimulation(new Vector3(position), new Vector3(normal), this.settings.simulation_params, effectData);
-		this.includeSimulation(sim);
+		this.includeSimulation(sim, callbacks);
 	};
 
 	ParticleSimulator.prototype.attachSpawnBehaviour = function(nr, rendererName) {
@@ -196,9 +196,11 @@ function (
 
 
 
-	ParticleSimulator.prototype.includeSimulation = function(sim) {
+	ParticleSimulator.prototype.includeSimulation = function(sim, callbacks) {
 
-
+        if (callbacks) {
+            sim.registerEffectCallbacks(callbacks);
+        }
 
 		for (var i = 0; i < this.renderers.length; i++) {
 			sim.registerParticleRenderer(this.renderers[i]);
@@ -239,6 +241,7 @@ function (
 
 	ParticleSimulator.prototype.updateSimulation = function (tpf, sim) {
 		if (!sim.active) return;
+
 		sim.updateSimParticles(tpf);
 
 		if (sim.particles.length == sim.recover.length) {

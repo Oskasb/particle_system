@@ -48,7 +48,19 @@ define({
 				{
 					"id":"flaredot",
 					"tiles":[[4, 0]]
-				}
+				},
+                {
+                    "id":"fielddot",
+                    "tiles":[[1, 2]]
+                },
+                {
+                    "id":"spinfield",
+                    "tiles":[[3, 1]]
+                },
+                {
+                    "id":"sinedot",
+                    "tiles":[[5, 1]]
+                }
 			]
 		}
 

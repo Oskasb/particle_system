@@ -20,6 +20,8 @@ define([
 		this.particles = [];
 		this.recover = [];
 		this.active = false;
+        this.onUpdate = null;
+        this.particleUpdate = null;
 	};
 
 	ParticleSimulation.prototype.initSimulation = function(posVec, normVec, defaultSettings, effectData) {
@@ -29,6 +31,17 @@ define([
 		this.active = true;
 	};
 
+
+    ParticleSimulation.prototype.registerEffectCallbacks = function(callbacks) {
+        if (callbacks.onUpdate) {
+            this.onUpdate = callbacks.onUpdate;
+        }
+
+        if (callbacks.particleUpdate) {
+            this.particleUpdate = callbacks.particleUpdate;
+        }
+
+    };
 
 	ParticleSimulation.prototype.registerParticleRenderer = function(renderer) {
 		this.renderers.push(renderer);
@@ -67,6 +80,11 @@ define([
 
 	ParticleSimulation.prototype.updateSimParticles = function(tpf) {
 
+        if (this.onUpdate) {
+            this.onUpdate(this);
+        }
+
+
 		for (var i = 0; i < this.particles.length; i++) {
 			var particle = this.particles[i];
 
@@ -87,25 +105,31 @@ define([
 
 			particle.lifeSpan -= deduct;
 
-			if (particle.lifeSpan < 0) {
-				this.notifyDied(particle);
-				continue;
-			}
+            if (this.particleUpdate) {
+                this.particleUpdate(particle);
+            } else {
+                // Note frame offset expects ideal frame (0.016) to make stable geometries
+                particle.progress = 1-((particle.lifeSpan - particle.frameOffset*0.016)  / particle.lifeSpanTotal);
 
-			// Note frame offset expects ideal frame (0.016) to make stable geometries
-			particle.progress = 1-((particle.lifeSpan - particle.frameOffset*0.016)  / particle.lifeSpanTotal);
+                particle.size += particle.growthFactor * this.valueFromCurve(particle.progress, particle.growth) * deduct;
+                particle.rotation += particle.spinspeed * this.valueFromCurve(particle.progress, particle.spin) * deduct;
 
-			particle.size += particle.growthFactor * this.valueFromCurve(particle.progress, particle.growth) * deduct;
-			particle.rotation += particle.spinspeed * this.valueFromCurve(particle.progress, particle.spin) * deduct;
+                particle.velocity.muld(particle.acceleration, particle.acceleration, particle.acceleration);
+                particle.velocity.add_d(0, particle.gravity*deduct, 0);
 
-			particle.velocity.muld(particle.acceleration, particle.acceleration, particle.acceleration);
-			particle.velocity.add_d(0, particle.gravity*deduct, 0);
+                this.calcVec.set(particle.velocity)
+                this.calcVec.muld(deduct, deduct, deduct);
+                particle.position.addv(this.calcVec);
 
-			this.calcVec.set(particle.velocity)
-			this.calcVec.muld(deduct, deduct, deduct);
-			particle.position.addv(this.calcVec);
+                particle.color.data[3] = particle.opacity * this.valueFromCurve(particle.progress, particle.alpha);
 
-			particle.color.data[3] = particle.opacity * this.valueFromCurve(particle.progress, particle.alpha);
+            }
+
+
+            if (particle.lifeSpan < 0) {
+                this.notifyDied(particle);
+                continue;
+            }
 
 			this.renderParticle(tpf, particle);
 		}

@@ -8,7 +8,7 @@ define({
 		},
 		{
 			"param":"count",
-			"value": 485,
+			"value": 25,
 			"type": "number",
 			"min": 1,
 			"max": 200
@@ -50,14 +50,14 @@ define({
 		},
 		{
 			"param":"stretch",
-			"value": 1,
+			"value": 0,
 			"type": "number",
 			"min": 0.0,
 			"max": 1.0
 		},
 		{
 			"param":"strength",
-			"value": 15,
+			"value": 0,
 			"type": "number",
 			"min": 0.0,
 			"max": 100.0
@@ -78,7 +78,7 @@ define({
 		},
 		{
 			"param":"gravity",
-			"value": -8,
+			"value": 0,
 			"type": "number",
 			"min": -20.0,
 			"max": 20.0

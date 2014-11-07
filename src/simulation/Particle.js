@@ -37,7 +37,6 @@ function (
 
 		this.acceleration = 1;
 		this.gravity = 0;
-
 		this.rotation = 0;
 		this.spinspeed = 0;
 		this.spin = [[0, 1], [1, 0]];
@@ -62,9 +61,9 @@ function (
 
 	Particle.prototype.joinSimulation = function (simParams, ratio) {
 		var simD = simParams.data;
-		this.position.x = simParams.position.x + simParams.normal.x*ratio;
-		this.position.y = simParams.position.y + simParams.normal.y*ratio;
-		this.position.z = simParams.position.z + simParams.normal.z*ratio;
+		this.position.x = simParams.position.x + simParams.normal.x*ratio *simD.stretch;
+		this.position.y = simParams.position.y + simParams.normal.y*ratio *simD.stretch;
+		this.position.z = simParams.position.z + simParams.normal.z*ratio *simD.stretch;
 
 		this.direction.x = (Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*simParams.normal.x;
 		this.direction.y = (Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*simParams.normal.y;
