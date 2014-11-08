@@ -44,12 +44,12 @@ define({
 			}
 		},
 		{
-			"id": "AdditiveTrail",
+			"id": "FastAdditiveTrail",
 			"atlas":"defaultSpriteAtlas",
 			"renderers": [
-				"TrailRenderer"
+				"FastTrailRenderer"
 			],
-			"poolCount": 1000,
+			"poolCount": 400,
 			"blending": {
 				"value": "AdditiveBlending",
 				"type": "option",

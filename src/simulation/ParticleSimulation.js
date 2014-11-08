@@ -22,6 +22,8 @@ define([
 		this.active = false;
         this.onUpdate = null;
         this.particleUpdate = null;
+		this.onParticleAdded = null;
+		this.onParticleDead = null;
 	};
 
 	ParticleSimulation.prototype.initSimulation = function(posVec, normVec, defaultSettings, effectData) {
@@ -41,6 +43,14 @@ define([
             this.particleUpdate = callbacks.particleUpdate;
         }
 
+		if (callbacks.onParticleAdded) {
+			this.onParticleAdded = callbacks.onParticleAdded;
+		}
+
+		if (callbacks.onParticleDead) {
+			this.onParticleDead = callbacks.onParticleDead;
+		}
+
     };
 
 	ParticleSimulation.prototype.registerParticleRenderer = function(renderer) {
@@ -56,6 +66,10 @@ define([
 		for (var i = 0; i < this.renderers.length; i++) {
 			this.renderers[i].died(particle)
 		}
+		if (this.onParticleDead) {
+			this.onParticleDead(particle);
+		}
+
 		this.recover.push(particle);
 	};
 
@@ -64,6 +78,7 @@ define([
 	ParticleSimulation.prototype.includeParticle = function(particle, ratio) {
 		particle.joinSimulation(this.params, ratio);
 		this.particles.push(particle);
+		this.onParticleAdded(particle);
 	};
 
 	ParticleSimulation.prototype.getInterpolatedInCurveAboveIndex = function(value, curve, index) {
@@ -126,7 +141,7 @@ define([
             }
 
 
-            if (particle.lifeSpan < 0) {
+            if (particle.lifeSpan < 0 || particle.requestKill) {
                 this.notifyDied(particle);
                 continue;
             }

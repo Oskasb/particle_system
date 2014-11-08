@@ -60,7 +60,11 @@ define({
                 {
                     "id":"sinedot",
                     "tiles":[[5, 1]]
-                }
+                },
+				{
+					"id":"projectile_1",
+					"tiles":[[7, 2]]
+				}
 			]
 		}
 

@@ -52,6 +52,7 @@ function (
 		this.offsetY = 0;
 
 		this.dead = true;
+		this.requestKill = false;
 	};
 
 	function randomBetween(min, max) {
@@ -133,6 +134,12 @@ function (
 
 	Particle.prototype.setDataUsage = function () {
 	};
+
+
+	Particle.prototype.killParticle = function () {
+		this.requestKill = true;
+	};
+
 
 	return Particle;
 });
