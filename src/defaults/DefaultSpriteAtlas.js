@@ -66,6 +66,14 @@ define({
 					"tiles":[[7, 2]]
 				},
 				{
+					"id":"splash_thick",
+					"tiles":[[1, 0]]
+				},
+				{
+					"id":"splash_thin",
+					"tiles":[[2, 0]]
+				},
+				{
 					"id":"smokey",
 					"tiles":[[3, 0]]
 				}
