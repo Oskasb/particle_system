@@ -62,9 +62,6 @@ function (
 
 	Particle.prototype.joinSimulation = function (simParams, ratio) {
 		var simD = simParams.data;
-		this.position.x = simParams.position.x + simParams.normal.x*ratio *simD.stretch;
-		this.position.y = simParams.position.y + simParams.normal.y*ratio *simD.stretch;
-		this.position.z = simParams.position.z + simParams.normal.z*ratio *simD.stretch;
 
 		this.direction.x = (Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*simParams.normal.x;
 		this.direction.y = (Math.random() -0.5) * (2*simD.spread) + (1-simD.spread)*simParams.normal.y;
@@ -75,6 +72,10 @@ function (
 		this.velocity.x = simD.strength*this.direction.x;
 		this.velocity.y = simD.strength*this.direction.y;
 		this.velocity.z = simD.strength*this.direction.z;
+
+		this.position.x = simParams.position.x + this.velocity.x * simD.stretch * ratio ;
+		this.position.y = simParams.position.y + this.velocity.y * simD.stretch * ratio ;
+		this.position.z = simParams.position.z + this.velocity.z * simD.stretch * ratio ;
 
 		this.sprite = simD.sprite;
 		this.trailSprite = simD.trailsprite;

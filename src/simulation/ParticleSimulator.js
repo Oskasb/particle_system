@@ -217,7 +217,7 @@ function (
 				console.log("");
 				return;
 			}
-			var ratio = 1 - simD.stretch * (simD.count-i) / simD.count;
+			var ratio = 1 - (simD.count-i) / simD.count;
 			sim.includeParticle(particle, ratio);
 		}
 	};
