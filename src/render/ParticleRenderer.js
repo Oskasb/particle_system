@@ -56,6 +56,8 @@ function (
 		entity.skip = true;
 		var textureCreator = new TextureCreator();
 		var texture = textureCreator.loadTexture2D(this.atlasConf.textureUrl.value, {
+			magFilter:"NearestNeighbor",
+			minFilter:"NearestNeighborNoMipMaps",
 			wrapS: 'EdgeClamp',
 			wrapT: 'EdgeClamp'
 		}, function() {

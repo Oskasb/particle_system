@@ -64,6 +64,10 @@ define({
 				{
 					"id":"projectile_1",
 					"tiles":[[7, 2]]
+				},
+				{
+					"id":"smokey",
+					"tiles":[[3, 0]]
 				}
 			]
 		}

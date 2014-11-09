@@ -73,12 +73,12 @@ define([
 		this.recover.push(particle);
 	};
 
-
-
 	ParticleSimulation.prototype.includeParticle = function(particle, ratio) {
 		particle.joinSimulation(this.params, ratio);
 		this.particles.push(particle);
-		this.onParticleAdded(particle);
+		if (this.onParticleAdded) {
+			this.onParticleAdded(particle);
+		}
 	};
 
 	ParticleSimulation.prototype.getInterpolatedInCurveAboveIndex = function(value, curve, index) {
