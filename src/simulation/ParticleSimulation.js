@@ -93,6 +93,57 @@ define([
 		return 0;
 	};
 
+
+	ParticleSimulation.prototype.applyParticleCurves = function(particle, deduct) {
+		particle.size += particle.growthFactor * this.valueFromCurve(particle.progress, particle.growth) * deduct;
+		particle.rotation += particle.spinspeed * this.valueFromCurve(particle.progress, particle.spin) * deduct;
+		particle.color.data[3] = particle.opacity * this.valueFromCurve(particle.progress, particle.alpha);
+	};
+
+	ParticleSimulation.prototype.defaultParticleUpdate = function(particle, deduct) {
+
+		// Note frame offset expects ideal frame (0.016) to make stable geometries
+		particle.progress = 1-((particle.lifeSpan - particle.frameOffset*0.016)  / particle.lifeSpanTotal);
+
+		this.applyParticleCurves(particle, deduct);
+
+		particle.velocity.muld(particle.acceleration, particle.acceleration, particle.acceleration);
+		particle.velocity.add_d(0, particle.gravity*deduct, 0);
+
+		this.calcVec.set(particle.velocity);
+		this.calcVec.muld(deduct, deduct, deduct);
+		particle.position.addv(this.calcVec);
+
+	};
+
+	ParticleSimulation.prototype.updateParticle = function(particle, tpf) {
+
+		if (particle.dead) {
+			return;
+		}
+
+		// Particles need to have a fixed geometry the first frame of their life or things go bonkerz when framerate varies.
+		var deduct = tpf;
+		if (!particle.frameCount) {
+			deduct = 0.016;
+		}
+
+		particle.lifeSpan -= deduct;
+
+		if (this.particleUpdate) {
+			this.particleUpdate(particle);
+		} else {
+			this.defaultParticleUpdate(particle, deduct)
+		}
+
+		if (particle.lifeSpan < 0 || particle.requestKill) {
+			this.notifyDied(particle);
+			return;
+		}
+
+		this.renderParticle(tpf, particle);
+	};
+
 	ParticleSimulation.prototype.updateSimParticles = function(tpf) {
 
         if (this.onUpdate) {
@@ -101,52 +152,7 @@ define([
 
 
 		for (var i = 0; i < this.particles.length; i++) {
-			var particle = this.particles[i];
-
-			if (particle == undefined) {
-				console.error("no particle", this.particles.length, i);
-				continue
-			}
-
-			if (particle.dead) {
-				continue;
-			}
-
-			// Particles need to have a fixed geometry the first frame of their life or things go bonkerz when framerate varies.
-			var deduct = tpf;
-			if (!particle.frameCount) {
-				deduct = 0.016;
-			}
-
-			particle.lifeSpan -= deduct;
-
-            if (this.particleUpdate) {
-                this.particleUpdate(particle);
-            } else {
-                // Note frame offset expects ideal frame (0.016) to make stable geometries
-                particle.progress = 1-((particle.lifeSpan - particle.frameOffset*0.016)  / particle.lifeSpanTotal);
-
-                particle.size += particle.growthFactor * this.valueFromCurve(particle.progress, particle.growth) * deduct;
-                particle.rotation += particle.spinspeed * this.valueFromCurve(particle.progress, particle.spin) * deduct;
-
-                particle.velocity.muld(particle.acceleration, particle.acceleration, particle.acceleration);
-                particle.velocity.add_d(0, particle.gravity*deduct, 0);
-
-                this.calcVec.set(particle.velocity)
-                this.calcVec.muld(deduct, deduct, deduct);
-                particle.position.addv(this.calcVec);
-
-                particle.color.data[3] = particle.opacity * this.valueFromCurve(particle.progress, particle.alpha);
-
-            }
-
-
-            if (particle.lifeSpan < 0 || particle.requestKill) {
-                this.notifyDied(particle);
-                continue;
-            }
-
-			this.renderParticle(tpf, particle);
+			this.updateParticle(this.particles[i], tpf)
 		}
 
 	};
