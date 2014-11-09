@@ -14,6 +14,10 @@ define({
 					"tiles":[[2, 4]]
 				},
 				{
+					"id":"shockwave",
+					"tiles":[[0, 0]]
+				},
+				{
 					"id":"tail",
 					"tiles":[[0, 5]]
 				},
