@@ -2,26 +2,18 @@ define([
 		'goo/renderer/MeshData',
 		'goo/renderer/Shader',
 		'goo/renderer/Material',
-		'goo/renderer/shaders/ShaderLib',
 		'goo/math/Vector3',
-		'goo/math/Vector4',
-		'goo/math/MathUtils',
 		'goo/entities/components/MeshRendererComponent',
-		'goo/renderer/Renderer',
-		'goo/renderer/TextureCreator'
+		'goo/renderer/Renderer'
 	],
 
 	function(
 		MeshData,
 		Shader,
 		Material,
-		ShaderLib,
 		Vector3,
-		Vector4,
-		MathUtils,
 		MeshRendererComponent,
-		Renderer,
-		TextureCreator
+		Renderer
 	) {
 		"use strict";
 
@@ -83,7 +75,7 @@ define([
 			meshData.vertexData.setDataUsage('DynamicDraw');
 			this.meshData = meshData;
 
-			var material = new Material(particleShader);
+			var material = new Material(particleTrailShader);
 			material.uniforms.alphakill = simConf.alphakill.value;
 			material.blendState.blending = simConf.blending.value;
 			material.cullState.enabled = false;
@@ -95,33 +87,7 @@ define([
 			entity.meshRendererComponent.cullMode = 'Never';
 			entity.addToWorld();
 
-			// var material2 = Material.createMaterial(ShaderLib.simpleColored);
-			// material2.wireframe = true;
-			// material2.uniforms.color = [1.0,0.0,0.0];
-			// material2.uniforms.alphakill = settings.alphakill.value;
-			// material2.blendState.blending = settings.blending.value;
-			// material2.cullState.enabled = false;
-			// material2.depthState.enabled = false;
-			// material2.renderQueue = 3010;
-			// entity.meshRendererComponent.materials[1] = material2;
-
-			/*
-
-			entity.skip = true;
-			var textureCreator = new TextureCreator();
-			var texture = textureCreator.loadTexture2D(this.atlasConf.textureUrl.value, {
-			//	magFilter:"NearestNeighbor",
-			//	minFilter:"NearestNeighborNoMipMaps",
-				wrapS: 'EdgeClamp',
-				wrapT: 'EdgeClamp'
-			}, function() {
-				entity.skip = false;
-			});
-			*/
-
 			material.setTexture('PARTICLE_MAP', texture);
-
-
 
 			var col = this.meshData.getAttributeBuffer(MeshData.COLOR);
 			var texcoord = this.meshData.getAttributeBuffer(MeshData.TEXCOORD0);
@@ -411,7 +377,7 @@ define([
 			this.renderedCount = 0;
 		};
 
-		var particleShader = {
+		var particleTrailShader = {
 			attributes: {
 				vertexPosition: MeshData.POSITION,
 				vertexColor: MeshData.COLOR,

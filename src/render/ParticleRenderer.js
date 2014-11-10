@@ -2,16 +2,14 @@ define([
 	'goo/renderer/MeshData',
 	'goo/renderer/Shader',
 	'goo/renderer/Material',
-	'goo/entities/components/MeshRendererComponent',
-	'goo/renderer/TextureCreator'
+	'goo/entities/components/MeshRendererComponent'
 ],
 
 function (
 	MeshData,
 	Shader,
 	Material,
-	MeshRendererComponent,
-	TextureCreator
+	MeshRendererComponent
 ) {
 	"use strict";
 
