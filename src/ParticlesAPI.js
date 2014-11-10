@@ -6,8 +6,8 @@ define([
 		ParticleSystem
 		) {
 
-		var ParticlesAPI = function(goo) {
-			this.particleSystem = new ParticleSystem(goo);
+		var ParticlesAPI = function(gooRunner) {
+			this.particleSystem = new ParticleSystem(gooRunner);
 		};
 
 		ParticlesAPI.prototype.setEnabled = function(enabled) {
@@ -20,10 +20,6 @@ define([
 
 		ParticlesAPI.prototype.spawnParticles = function(id, position, normal, effectData, callbacks) {
 			this.particleSystem.spawnParticleSimulation(id, position, normal, effectData, callbacks)
-		};
-
-		ParticlesAPI.prototype.wakeParticle = function(id, position, normal, effectData) {
-		//	this.particleSystem.wakeParticle(id)
 		};
 
 		ParticlesAPI.prototype.createParticleSystems = function(systemConfigs, rendererConfigs, atlasConfig, texture) {

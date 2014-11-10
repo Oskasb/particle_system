@@ -1,50 +1,22 @@
 define([
 	'particle_system/simulation/Particle',
-
 	'particle_system/simulation/ParticleSimulation',
-	'goo/math/Vector3',
-	'goo/math/Vector4',
-	'goo/math/MathUtils',
-	'goo/renderer/MeshData',
-	'goo/entities/EntityUtils',
-	'particle_system/chaos/ParticleBehaviors',
 	'particle_system/render/ParticleRenderer',
-	'particle_system/render/LineRenderer',
-	'particle_system/render/TriangleRenderer',
 	'particle_system/render/TrailRenderer'
 ],
 
 function (
 	Particle,
 	ParticleSimulation,
-	Vector3,
-	Vector4,
-	MathUtils,
-	MeshData,
-	EntityUtils,
-	ParticleBehaviors,
 	ParticleRenderer,
-	LineRenderer,
-	TriangleRenderer,
 	TrailRenderer
 ) {
 	"use strict";
 
-	function createSpawner(name) {
-		if (!name) {
-			return null;
-		}
-
-		return ParticleBehaviors[name];
-	}
 
 	function createRenderer(name) {
 		if (name === 'ParticleRenderer') {
 			return new ParticleRenderer();
-		} else if (name === 'LineRenderer') {
-			return new LineRenderer();
-		} else if (name === 'TriangleRenderer') {
-			return new TriangleRenderer();
 		} else if (name === 'TrailRenderer') {
 			return new TrailRenderer();
 		}
@@ -109,13 +81,10 @@ function (
 			return;
 		}
 
-		sim.initSimulation(new Vector3(position), new Vector3(normal), this.settings.simulation_params, effectData);
+		sim.initSimulation(position, normal, this.settings.simulation_params, effectData);
 		this.includeSimulation(sim, callbacks);
 	};
 
-	ParticleSimulator.prototype.attachSpawnBehaviour = function(nr, rendererName) {
-		this.behaviors[nr] = createSpawner(rendererName);
-	};
 
 	ParticleSimulator.prototype.initRenderer = function(rendererName, spriteAtlas, texture) {
 		var rendererConf = this.rendererSettings[rendererName];
@@ -128,16 +97,6 @@ function (
 		}
 	};
 
-
-	ParticleSimulator.prototype.rebuild = function () {
-		this.spawner = createSpawner(this.settings.spawner.value);
-		for (var i = 0; i < this.renderers.length; i++) {
-			if (this.renderers[i].rebuild) {
-				this.renderers[i].rebuild();
-			}
-			this.renderers[i].setVisible(this.renderers[i].globalSettings.enabled);
-		}
-	};
 
 	ParticleSimulator.prototype.remove = function () {
 		for (var i = 0; i < this.renderers.length; i++) {
