@@ -15,21 +15,10 @@ function (
 		this.groups = {};
 	}
 
-	ParticleSystem.prototype.attachAtlases = function (atlasConfigs) {
-		for (var i = 0; i < atlasConfigs.atlases.length; i++) {
-			this.atlases[atlasConfigs.atlases[i].id] = atlasConfigs.atlases[i];
-		}
-	};
-
-	ParticleSystem.prototype.getAtlasForSetting = function(simSettings) {
-		return this.atlases[simSettings.atlas];
-	};
-
-	ParticleSystem.prototype.addConfiguredSystems = function (simConfigs, rendererConfigs, atlasConfigs) {
-		this.attachAtlases(atlasConfigs);
+	ParticleSystem.prototype.addConfiguredAtlasSystems = function (simConfigs, rendererConfigs, atlasConfig, texture) {
 		for (var i = 0; i < simConfigs.simulators.length; i++) {
 			var simSettings = simConfigs.simulators[i];
-			var simulator = new ParticleSimulator(this.goo, simSettings, rendererConfigs, this.getAtlasForSetting(simSettings));
+			var simulator = new ParticleSimulator(this.goo, simSettings, rendererConfigs, atlasConfig, texture);
 			this.simulators[simSettings.id] = simulator;
 		}
 	};

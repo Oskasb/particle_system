@@ -59,7 +59,7 @@ define([
 			return Math.random() * (max - min) + min;
 		}
 
-		TrailRenderer.prototype.init = function(goo, simConf, settings, spriteAtlas) {
+		TrailRenderer.prototype.init = function(goo, simConf, settings, spriteAtlas, texture) {
 			this.settings = settings;
 
 			this.atlasConf = spriteAtlas;
@@ -105,16 +105,20 @@ define([
 			// material2.renderQueue = 3010;
 			// entity.meshRendererComponent.materials[1] = material2;
 
+			/*
+
 			entity.skip = true;
 			var textureCreator = new TextureCreator();
 			var texture = textureCreator.loadTexture2D(this.atlasConf.textureUrl.value, {
-				magFilter:"NearestNeighbor",
-				minFilter:"NearestNeighborNoMipMaps",
+			//	magFilter:"NearestNeighbor",
+			//	minFilter:"NearestNeighborNoMipMaps",
 				wrapS: 'EdgeClamp',
 				wrapT: 'EdgeClamp'
 			}, function() {
 				entity.skip = false;
 			});
+			*/
+
 			material.setTexture('PARTICLE_MAP', texture);
 
 

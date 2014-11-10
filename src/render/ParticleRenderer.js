@@ -22,7 +22,7 @@ function (
 		this.sprites = {};
 	}
 
-	ParticleRenderer.prototype.init = function (goo, simConf, settings, spriteAtlas) {
+	ParticleRenderer.prototype.init = function (goo, simConf, settings, spriteAtlas, texture) {
 
 
 
@@ -53,8 +53,12 @@ function (
 		entity.meshRendererComponent.cullMode = 'Never';
 		entity.addToWorld();
 
+		/*
 		entity.skip = true;
 		var textureCreator = new TextureCreator();
+
+
+
 		var texture = textureCreator.loadTexture2D(this.atlasConf.textureUrl.value, {
 			magFilter:"NearestNeighbor",
 			minFilter:"NearestNeighborNoMipMaps",
@@ -63,6 +67,8 @@ function (
 		}, function() {
 			entity.skip = false;
 		});
+
+		*/
 		material.setTexture('PARTICLE_MAP', texture);
 
 		var offset = this.meshData.getAttributeBuffer('OFFSET');
