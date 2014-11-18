@@ -8,6 +8,8 @@ define(function() {
 	var curves = {
 		"zeroToOne":    [[0, 0], [1, 1]],
 		"oneToZero":    [[0, 1], [1, 0]],
+		"quickFadeOut": [[0, 1], [0.9,1], [1, 0]],
+		"quickInOut":   [[0, 0], [0.1,1], [0.9,1], [1, 0]],
 		"posToNeg":     [[0, 1], [1,-1]],
 		"negToPos":     [[0,-1], [1, 1]],
 		"zeroOneZero":  [[0, 0], [0.5,1], [1, 0]],

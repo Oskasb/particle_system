@@ -10,6 +10,7 @@ function (
 	"use strict";
 
 	function Particle(idx) {
+		this.calcVec = new Vector3();
 		this.index = idx;
 		this.position 	= new Vector3();
 		this.direction = new Vector3();
@@ -134,6 +135,38 @@ function (
 	};
 
 	Particle.prototype.setDataUsage = function () {
+	};
+
+
+	Particle.prototype.getInterpolatedInCurveAboveIndex = function(value, curve, index) {
+		return curve[index][1] + (value - curve[index][0]) / (curve[index+1][0] - curve[index][0])*(curve[index+1][1]-curve[index][1]);
+	};
+
+	Particle.prototype.valueFromCurve = function(value, curve) {
+		for (var i = 0; i < curve.length; i++) {
+			if (!curve[i+1]) return 0;
+			if (curve[i+1][0] > value) return this.getInterpolatedInCurveAboveIndex(value, curve, i)
+		}
+		return 0;
+	};
+
+	Particle.prototype.applyParticleCurves = function(deduct) {
+		this.size += this.growthFactor * this.valueFromCurve(this.progress, this.growth) * deduct;
+		this.rotation += this.spinspeed * this.valueFromCurve(this.progress, this.spin) * deduct;
+		this.color.data[3] = this.opacity * this.valueFromCurve(this.progress, this.alpha);
+	};
+
+	Particle.prototype.defaultParticleUpdate = function(deduct) {
+		this.progress = 1-((this.lifeSpan - this.frameOffset*0.016)  / this.lifeSpanTotal);
+
+		this.applyParticleCurves(deduct);
+
+		this.velocity.muld(this.acceleration, this.acceleration, this.acceleration);
+		this.velocity.add_d(0, this.gravity*deduct, 0);
+
+		this.calcVec.set(this.velocity);
+		this.calcVec.muld(deduct, deduct, deduct);
+		this.position.addv(this.calcVec);
 	};
 
 

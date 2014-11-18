@@ -28,8 +28,7 @@ define([
 
 	ParticleSimulation.prototype.initSimulation = function(posVec, normVec, defaultSettings, effectData) {
 		this.resetSimulation();
-		this.params = new SimulationParameters(new Vector3(posVec), new Vector3(normVec), DefaultSimulationParams.particle_params, effectData);
-		this.calcVec = new Vector3();
+		this.params = new SimulationParameters(new Vector3(posVec), new Vector3(normVec), DefaultSimulationParams.particle_params, effectData);;
 		this.active = true;
 	};
 
@@ -81,41 +80,6 @@ define([
 		}
 	};
 
-	ParticleSimulation.prototype.getInterpolatedInCurveAboveIndex = function(value, curve, index) {
-		return curve[index][1] + (value - curve[index][0]) / (curve[index+1][0] - curve[index][0])*(curve[index+1][1]-curve[index][1]);
-	};
-
-	ParticleSimulation.prototype.valueFromCurve = function(value, curve) {
-		for (var i = 0; i < curve.length; i++) {
-			if (!curve[i+1]) return 0;
-			if (curve[i+1][0] > value) return this.getInterpolatedInCurveAboveIndex(value, curve, i)
-		}
-		return 0;
-	};
-
-
-	ParticleSimulation.prototype.applyParticleCurves = function(particle, deduct) {
-		particle.size += particle.growthFactor * this.valueFromCurve(particle.progress, particle.growth) * deduct;
-		particle.rotation += particle.spinspeed * this.valueFromCurve(particle.progress, particle.spin) * deduct;
-		particle.color.data[3] = particle.opacity * this.valueFromCurve(particle.progress, particle.alpha);
-	};
-
-	ParticleSimulation.prototype.defaultParticleUpdate = function(particle, deduct) {
-
-		// Note frame offset expects ideal frame (0.016) to make stable geometries
-		particle.progress = 1-((particle.lifeSpan - particle.frameOffset*0.016)  / particle.lifeSpanTotal);
-
-		this.applyParticleCurves(particle, deduct);
-
-		particle.velocity.muld(particle.acceleration, particle.acceleration, particle.acceleration);
-		particle.velocity.add_d(0, particle.gravity*deduct, 0);
-
-		this.calcVec.set(particle.velocity);
-		this.calcVec.muld(deduct, deduct, deduct);
-		particle.position.addv(this.calcVec);
-
-	};
-
 	ParticleSimulation.prototype.updateParticle = function(particle, tpf) {
 
 		if (particle.dead) {
@@ -133,7 +97,7 @@ define([
 		if (this.particleUpdate) {
 			this.particleUpdate(particle);
 		} else {
-			this.defaultParticleUpdate(particle, deduct)
+			particle.defaultParticleUpdate(deduct);
 		}
 
 		if (particle.lifeSpan < 0 || particle.requestKill) {

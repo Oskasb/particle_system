@@ -155,31 +155,22 @@ function (
 
 	};
 
-	ParticleRenderer.prototype.updateParticle = function (tpf, particle) {
-		if (!this.renderedCount) {
-			 this.initFrame();
-		}
-		this.renderedCount++;
-
-
-		if (particle.dead) {
-			return;
-		}
+	ParticleRenderer.prototype.updateParticleBufferData = function (tpf, particle) {
 		var j, i, l;
 		i = this.renderedCount;
 
 		particle.setTileInfo(this.sprites[particle.sprite], this.scaleX, this.scaleY);
 		particle.updateAtlasOffsets(this.loopScale);
-	//	if (this.isTiled) {
+		//	if (this.isTiled) {
 
 
-			for (j = 0; j < 4; j++) {
-				this.tile[(4 * 4 * i + 0) + 4 * j] = particle.offsetX;
-				this.tile[(4 * 4 * i + 1) + 4 * j] = particle.offsetY;
-				this.tile[(4 * 4 * i + 2) + 4 * j] = particle.scaleX;
-				this.tile[(4 * 4 * i + 3) + 4 * j] = particle.scaleY;
-			}
-	//	}
+		for (j = 0; j < 4; j++) {
+			this.tile[(4 * 4 * i + 0) + 4 * j] = particle.offsetX;
+			this.tile[(4 * 4 * i + 1) + 4 * j] = particle.offsetY;
+			this.tile[(4 * 4 * i + 2) + 4 * j] = particle.scaleX;
+			this.tile[(4 * 4 * i + 3) + 4 * j] = particle.scaleY;
+		}
+		//	}
 
 		var posdata = particle.position.data;
 		var coldata = particle.color.data;
@@ -198,7 +189,20 @@ function (
 		}
 
 		this.lastAlive = i + 1;
+	};
 
+	ParticleRenderer.prototype.updateParticle = function (tpf, particle) {
+		if (!this.renderedCount) {
+			 this.initFrame();
+		}
+
+		this.renderedCount++;
+
+		if (particle.dead) {
+			return;
+		}
+
+		this.updateParticleBufferData(tpf, particle);
 	};
 
 	ParticleRenderer.prototype.updateMeshdata = function () {

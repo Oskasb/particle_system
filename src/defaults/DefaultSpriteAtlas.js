@@ -80,6 +80,22 @@ define({
 				{
 					"id":"smokey",
 					"tiles":[[3, 0]]
+				},
+				{
+					"id":"snow_4",
+					"tiles":[[7, 7]]
+				},
+				{
+					"id":"snow_3",
+					"tiles":[[6, 7]]
+				},
+				{
+					"id":"snow_2",
+					"tiles":[[5, 7]]
+				},
+				{
+					"id":"snow_1",
+					"tiles":[[4, 7]]
 				}
 			]
 		}

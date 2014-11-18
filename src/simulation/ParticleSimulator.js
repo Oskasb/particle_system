@@ -153,12 +153,11 @@ function (
 		}
 
 		if (sim.particles.length != sim.recover.length) {
-			console.error("count missmatch", sim)
+			console.error("count missmatch", sim);
 			return;
 		}
 
 		sim.resetSimulation();
-
 	};
 
 	ParticleSimulator.prototype.updateSimulation = function (tpf, sim) {
