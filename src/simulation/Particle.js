@@ -93,6 +93,11 @@ function (
 		this.color0.data[0] = simD.color0[0] *(1-simD.colorRandom)+simD.colorRandom*Math.random();
 		this.color0.data[1] = simD.color0[1] *(1-simD.colorRandom)+simD.colorRandom*Math.random();
 		this.color0.data[2] = simD.color0[2] *(1-simD.colorRandom)+simD.colorRandom*Math.random();
+
+		this.color.data[0] = this.color0[0];
+		this.color.data[1] = this.color0[1];
+		this.color.data[2] = this.color0[2];
+
 		this.colorCurve = simD.colorCurve;
 		this.opacity = randomBetween(simD.opacity[0], simD.opacity[1]);
 		this.alpha = simD.alpha;
