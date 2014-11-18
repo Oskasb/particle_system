@@ -9,6 +9,7 @@ define(function() {
 		"zeroToOne":    [[0, 0], [1, 1]],
 		"oneToZero":    [[0, 1], [1, 0]],
 		"quickFadeOut": [[0, 1], [0.9,1], [1, 0]],
+		"quickFadeIn":  [[0, 0], [0.2,1], [1, 1]],
 		"quickInOut":   [[0, 0], [0.1,1], [0.9,1], [1, 0]],
 		"posToNeg":     [[0, 1], [1,-1]],
 		"negToPos":     [[0,-1], [1, 1]],

@@ -2,9 +2,26 @@ define({
 	"id": "defaultConfig",
 	"particle_params":[
 		{
-			"param":"color",
-			"value": [0.6, 0.7, 1, 1],
+			"param":"color0",
+			"value": [0.4, 0.7, 1, 1],
 			"type": "color"
+		},
+		{
+			"param":"color1",
+			"value": [0.8, 0.2, 0, 1],
+			"type": "color"
+		},
+		{
+			"param":"colorCurve",
+			"value": "oneToZero",
+			"type": "curve",
+			"values":   ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"],
+			"texts":    ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
+		},
+		{
+			"param":"colorRandom",
+			"value": 0,
+			"type": "number"
 		},
 		{
 			"param":"count",

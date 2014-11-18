@@ -13,10 +13,11 @@ function (
 		this.calcVec = new Vector3();
 		this.index = idx;
 		this.position 	= new Vector3();
-		this.direction = new Vector3();
+		this.direction  = new Vector3();
 		this.velocity 	= new Vector3();
 		this.color 		= new Vector4();
-
+		this.color0 	= new Vector3();
+		this.color1 	= new Vector3();
 
 		this.id = Particle.ID++;
 		this.reset();
@@ -28,6 +29,10 @@ function (
 		this.position.set(0, 0, 0);
 		this.velocity.set(0, 0, 0);
 		this.color.set(1, 1, 1, 1);
+		this.color0.set(1, 1, 1);
+		this.color1.set(1, 1, 1);
+		this.colorBlend = 0;
+		this.colorCurve = [[0, 1], [1, 0]];
 
 		this.opacity = 1;
 		this.alpha = [[0, 0], [1, 1]];
@@ -82,7 +87,13 @@ function (
 		this.trailSprite = simD.trailsprite;
 		this.trailWidth = simD.trailwidth;
 		this.loopcount = simD.loopcount;
-		this.color.set(simD.color);
+
+		this.color1.seta(simD.color1);
+
+		this.color0.data[0] = simD.color0[0] *(1-simD.colorRandom)+simD.colorRandom*Math.random();
+		this.color0.data[1] = simD.color0[1] *(1-simD.colorRandom)+simD.colorRandom*Math.random();
+		this.color0.data[2] = simD.color0[2] *(1-simD.colorRandom)+simD.colorRandom*Math.random();
+		this.colorCurve = simD.colorCurve;
 		this.opacity = randomBetween(simD.opacity[0], simD.opacity[1]);
 		this.alpha = simD.alpha;
 
@@ -154,6 +165,11 @@ function (
 		this.size += this.growthFactor * this.valueFromCurve(this.progress, this.growth) * deduct;
 		this.rotation += this.spinspeed * this.valueFromCurve(this.progress, this.spin) * deduct;
 		this.color.data[3] = this.opacity * this.valueFromCurve(this.progress, this.alpha);
+
+		this.colorBlend = this.valueFromCurve(this.progress, this.colorCurve);
+		this.color.data[0] = this.color0.data[0]*this.colorBlend + this.color1.data[0]*(1-this.colorBlend);
+		this.color.data[1] = this.color0.data[1]*this.colorBlend + this.color1.data[1]*(1-this.colorBlend);
+		this.color.data[2] = this.color0.data[2]*this.colorBlend + this.color1.data[2]*(1-this.colorBlend);
 	};
 
 	Particle.prototype.defaultParticleUpdate = function(deduct) {

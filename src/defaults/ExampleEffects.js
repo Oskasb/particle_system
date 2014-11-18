@@ -3,11 +3,14 @@ define({
 		{
 			"id":"firework_blue",
 			"effect_data":{
-				"color":[0.4,0.4, 1, 1],
+				"color0":[0.6,1, 1],
+				"color1":[0.0,0.7, 1],
+				"colorRandom":0.4,
+				"colorCurve":[[0, 1], [0.05, 0.6], [0.3, 1],[0.45, 0.4], [0.6, 1], [0.75, 0.3], [0.9,1 ], [1,0]],
 				"count":40,
 				"opacity":[0.4, 1],
-				"alpha":[[0,1], [0.15, 0], [0.3, 1],[0.5, 0], [0.7, 1] ,[1,0]],
-				"size":[0.2, 0.22],
+				"alpha":[[0,1], [0.3, 1],[1,0]],
+				"size":[0.05, 0.12],
 				"growthFactor":[0.01, 0.7],
 				"growth":[[0, -1], [0.05, 1], [0.3, 2],[0.45, -2], [0.6, 1], [0.75, -1], [0.9,1 ], [1,0]],
 				"stretch":1,
@@ -21,14 +24,17 @@ define({
 				"lifespan":[1, 3],
 				"sprite":"dot_seq",
 				"loopcount":15,
-				"trailsprite":"bluetrails",
-				"trailwidth":0.8
+				"trailsprite":"tail",
+				"trailwidth":0.3
 			}
 		},
 		{
 			"id":"firework_red",
 			"effect_data":{
-				"color":[1,0.3, 0.3, 1],
+				"color0":[1, 0.8, 0.3],
+				"color1":[1, 0, 0.1],
+				"colorRandom":0.4,
+				"colorCurve":[[0, 0], [0.15, 1], [0.2, 0.7], [0.3, 0],[0.45, 0.5], [0.6, 0], [0.75, 0.5], [1,0]],
 				"count":30,
 				"opacity":[0.99, 1],
 				"alpha":"oneToZero",
@@ -53,7 +59,8 @@ define({
 		{
 			"id":"firework_green",
 			"effect_data":{
-				"color":[0.4, 1, 0.4, 1],
+				"color0":[0.4, 1, 0.4],
+				"colorRandom":0.4,
 				"count":30,
 				"opacity":[0.4, 1],
 				"alpha":"oneToZero",
@@ -78,11 +85,13 @@ define({
 		{
 			"id":"firework_cone_yellow",
 			"effect_data":{
-				"color":[0.8,0.8, 0.3, 1],
+				"color0":[1,1, 0],
+				"color1":[0.8,0.5, 0.6],
+				"colorRandom":0.6,
 				"count":15,
 				"opacity":[0.7, 1],
 				"alpha":"oneToZero",
-				"size":[0.22, 0.3],
+				"size":[0.32, 0.6],
 				"growthFactor":[-0.01, -0.7],
 				"growth":"oneToZero",
 				"stretch":0.0001,
@@ -97,13 +106,14 @@ define({
 				"sprite":"spinfield",
 				"loopcount":15,
 				"trailsprite":"tail",
-				"trailwidth":0.1
+				"trailwidth":0.2
 			}
 		},
         {
             "id":"tail_orange",
             "effect_data":{
-                "color":[1,0.4, 0.2, 1],
+                "color0":[1,0.4, 0.2],
+	            "colorRandom":0,
                 "count":1,
                 "opacity":[0.7, 1],
                 "alpha":"oneToZero",
