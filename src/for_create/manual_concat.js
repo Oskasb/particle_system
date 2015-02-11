@@ -1,20 +1,6 @@
-/**
- * Implement this method to initialize your script.
- * Called when pressing play and when running exported projects.
- *
- * @param {object} args
- *     Refer to http://www.goocreate.com/learn/parameters
- * @param {object} ctx
- *     Refer to http://www.goocreate.com/learn/the-ctx-object
- * @param {object} goo
- *     Refer to http://www.goocreate.com/learn/the-goo-object
- */
 
+var MeshData, Shader, Material, MeshRendererComponent, Vector3, Vector4, Renderer, trailDirection, trailCamVec;
 
-var MeshData, Shader, Material, MeshRendererComponent, Vector3, Vector4, Renderer
-
-var trailDirection;
-var trailCamVec;
 
 
 
@@ -28,101 +14,36 @@ var setup = function(args, ctx, goo) {
 	Vector4 = goo.Vector4;
 	Renderer = goo.Renderer;
 
-	trailDirection = new Vector3();
-	trailCamVec = new Vector3();
+	trailDirection = new goo.Vector3();
+	trailCamVec = new goo.Vector3();
 
-	ctx.particlesAPI = new ParticlesAPI(ctx.world.gooRunner)
+	ctx.particlesAPI = new ParticlesAPI(ctx.world.gooRunner);
 
-
-	console.log("Setup Particles:", ctx.particlesAPI, ctx.entity)
+	console.log("Setup Particles:", ctx.particlesAPI, ctx.entity);
 
 	var tx = ctx.entity.meshRendererComponent.materials[0]._textureMaps.DIFFUSE_MAP;
 
+	ctx.spawnParticles = function(args) {
+		ctx.particlesAPI.spawnParticles(args.systemId, args.pos, args.vel, args.effectData, args.callbacks)
+	};
+
+
 	ctx.particlesAPI.createParticleSystems(DefaultSimulators, DefaultRendererConfigs, DefaultSpriteAtlas.atlases[0], tx);
 
+	goo.SystemBus.addListener('spawn_particles', ctx.spawnParticles);
 };
 
-/**
- * Implement this method to do cleanup.
- * Called when the script is stopped or deleted.
- *
- * @param {object} args
- *     Refer to http://www.goocreate.com/learn/parameters
- * @param {object} ctx
- *     Refer to http://www.goocreate.com/learn/the-ctx-object
- * @param {object} goo
- *     Refer to http://www.goocreate.com/learn/the-goo-object
- */
 var cleanup = function(args, ctx, goo) {
-
+	goo.SystemBus.removeListener('spawn_particles', ctx.spawnParticles);
+	ctx.particlesAPI.cleanupParticleSystems();
+	delete ctx.particlesAPI;
 };
 
-/**
- * This function will be called every frame.
- *
- * @param {object} args
- *     Contains all the parameters defined in the 'parameters' variable below.
- *     Its values are chosen in the scripts panel.
- *
- * @param {object} ctx
- *     Refer to http://www.goocreate.com/learn/the-ctx-object
- * @param {object} goo
- *     Refer to http://www.goocreate.com/learn/the-goo-object
- */
 var update = function(args, ctx, goo) {
-
-	var eData = {
-		"color":[0.4,0.4, 1, 1],
-		"count":40,
-		"opacity":[0.4, 1],
-		"alpha":[[0,1], [0.15, 0], [0.3, 1],[0.5, 0], [0.7, 1] ,[1,0]],
-		"size":[0.2, 0.22],
-		"growthFactor":[0.01, 0.7],
-		"growth":[[0, -1], [0.05, 1], [0.3, 2],[0.45, -2], [0.6, 1], [0.75, -1], [0.9,1 ], [1,0]],
-		"stretch":1,
-		"strength":12,
-		"spread":0.6,
-		"acceleration":0.97,
-		"gravity":-9,
-		"rotation":[0,7],
-		"spin":"oneToZero",
-		"spinspeed":[-15, 15],
-		"lifespan":[1, 3],
-		"sprite":"dot_seq",
-		"loopcount":15,
-		"trailsprite":"bluetrails",
-		"trailwidth":0.8
-	}
-
-	ctx.particlesAPI.spawnParticles(
-		'AdditiveParticleAndTrail',
-		ctx.entity.transformComponent.transform.translation,
-		new Vector3(0.5-Math.random(), 1 ,0.5-Math.random()),
-		eData);
-
-
 	ctx.particlesAPI.requestFrameUpdate(ctx.world.tpf);
-
 };
 
-/**
- * Parameters defined here will be available on the 'args' object as 'args.key'
- * and customizable using the script panel. Parameters are defined like below.
- * 'key', 'type', and 'default' are required properties.
- *
- * For details refer to: http://www.goocreate.com/learn/parameters
- */
 var parameters = [];
-
-
-
-
-
-
-// Deps:
-
-// var MeshData, Shader, Material, MeshRendererComponent, Vector3, Vector4, Renderer
-
 
 
 // Particle script follow...
@@ -151,7 +72,9 @@ ParticlesAPI.prototype.removeParticleSystem = function(id) {
 	this.particleSystem.remove(id)
 };
 
-
+ParticlesAPI.prototype.cleanupParticleSystems = function() {
+	this.particleSystem.remove()
+};
 
 function ParticleSystem(goo) {
 	this.goo = goo;
@@ -177,13 +100,23 @@ ParticleSystem.prototype.get = function (id) {
 	return this.simulators[id];
 };
 
-ParticleSystem.prototype.remove = function (id) {
+ParticleSystem.prototype.removeParticleSystemId = function(id) {
 	if (this.simulators[id]) {
 		this.simulators[id].remove();
 		delete this.simulators[id];
 	}
 };
 
+ParticleSystem.prototype.remove = function (id) {
+
+	if (!id) {
+		for (var key in this.simulators) {
+			this.removeParticleSystemId(key);
+		}
+	} else {
+		this.removeParticleSystemId(id);
+	}
+};
 ParticleSystem.prototype.wakeParticle = function(id) {
 	var simulator = this.simulators[id];
 	if (simulator) {
@@ -215,6 +148,10 @@ ParticleSystem.prototype.update = function(tpf) {
 var curves = {
 	"zeroToOne":    [[0, 0], [1, 1]],
 	"oneToZero":    [[0, 1], [1, 0]],
+	"quickFadeOut": [[0, 1], [0.9,1], [1, 0]],
+	"quickFadeIn":  [[0, 0], [0.2,1], [1, 1]],
+	"centerStep":   [[0, 0],[0.45, 0], [0.55, 1],[1,1]],
+	"quickInOut":   [[0, 0], [0.1,1], [0.9,1], [1, 0]],
 	"posToNeg":     [[0, 1], [1,-1]],
 	"negToPos":     [[0,-1], [1, 1]],
 	"zeroOneZero":  [[0, 0], [0.5,1], [1, 0]],
@@ -252,7 +189,6 @@ SimulationParameters.prototype.configureData = function(simParams, effectData) {
 	data.effectCount = data.count;
 	return data;
 };
-
 
 function createRenderer(name) {
 	if (name === 'ParticleRenderer') {
@@ -393,12 +329,11 @@ ParticleSimulator.prototype.recoverSimulation = function(sim) {
 	}
 
 	if (sim.particles.length != sim.recover.length) {
-		console.error("count missmatch", sim)
+		console.error("count missmatch", sim);
 		return;
 	}
 
 	sim.resetSimulation();
-
 };
 
 ParticleSimulator.prototype.updateSimulation = function (tpf, sim) {
@@ -430,8 +365,6 @@ ParticleSimulator.prototype.update = function (tpf) {
 
 };
 
-
-
 var ParticleSimulation = function() {
 	this.resetSimulation();
 };
@@ -449,8 +382,7 @@ ParticleSimulation.prototype.resetSimulation = function() {
 
 ParticleSimulation.prototype.initSimulation = function(posVec, normVec, defaultSettings, effectData) {
 	this.resetSimulation();
-	this.params = new SimulationParameters(new Vector3(posVec), new Vector3(normVec), DefaultSimulationParams.particle_params, effectData);
-	this.calcVec = new Vector3();
+	this.params = new SimulationParameters(new Vector3(posVec), new Vector3(normVec), DefaultSimulationParams.particle_params, effectData);;
 	this.active = true;
 };
 
@@ -502,41 +434,6 @@ ParticleSimulation.prototype.includeParticle = function(particle, ratio) {
 	}
 };
 
-ParticleSimulation.prototype.getInterpolatedInCurveAboveIndex = function(value, curve, index) {
-	return curve[index][1] + (value - curve[index][0]) / (curve[index+1][0] - curve[index][0])*(curve[index+1][1]-curve[index][1]);
-};
-
-ParticleSimulation.prototype.valueFromCurve = function(value, curve) {
-	for (var i = 0; i < curve.length; i++) {
-		if (!curve[i+1]) return 0;
-		if (curve[i+1][0] > value) return this.getInterpolatedInCurveAboveIndex(value, curve, i)
-	}
-	return 0;
-};
-
-
-ParticleSimulation.prototype.applyParticleCurves = function(particle, deduct) {
-	particle.size += particle.growthFactor * this.valueFromCurve(particle.progress, particle.growth) * deduct;
-	particle.rotation += particle.spinspeed * this.valueFromCurve(particle.progress, particle.spin) * deduct;
-	particle.color.data[3] = particle.opacity * this.valueFromCurve(particle.progress, particle.alpha);
-};
-
-ParticleSimulation.prototype.defaultParticleUpdate = function(particle, deduct) {
-
-	// Note frame offset expects ideal frame (0.016) to make stable geometries
-	particle.progress = 1-((particle.lifeSpan - particle.frameOffset*0.016)  / particle.lifeSpanTotal);
-
-	this.applyParticleCurves(particle, deduct);
-
-	particle.velocity.muld(particle.acceleration, particle.acceleration, particle.acceleration);
-	particle.velocity.add_d(0, particle.gravity*deduct, 0);
-
-	this.calcVec.set(particle.velocity);
-	this.calcVec.muld(deduct, deduct, deduct);
-	particle.position.addv(this.calcVec);
-
-};
-
 ParticleSimulation.prototype.updateParticle = function(particle, tpf) {
 
 	if (particle.dead) {
@@ -552,9 +449,9 @@ ParticleSimulation.prototype.updateParticle = function(particle, tpf) {
 	particle.lifeSpan -= deduct;
 
 	if (this.particleUpdate) {
-		this.particleUpdate(particle);
+		this.particleUpdate(particle, deduct);
 	} else {
-		this.defaultParticleUpdate(particle, deduct)
+		particle.defaultParticleUpdate(deduct);
 	}
 
 	if (particle.lifeSpan < 0 || particle.requestKill) {
@@ -589,14 +486,16 @@ ParticleSimulation.prototype.renderParticle = function(tpf, particle) {
 
 };
 
-
 function Particle(idx) {
+	this.calcVec = new Vector3();
+	this.upVector = new Vector3();
 	this.index = idx;
 	this.position 	= new Vector3();
-	this.direction = new Vector3();
+	this.direction  = new Vector3();
 	this.velocity 	= new Vector3();
 	this.color 		= new Vector4();
-
+	this.color0 	= new Vector3();
+	this.color1 	= new Vector3();
 
 	this.id = Particle.ID++;
 	this.reset();
@@ -608,6 +507,13 @@ Particle.prototype.reset = function () {
 	this.position.set(0, 0, 0);
 	this.velocity.set(0, 0, 0);
 	this.color.set(1, 1, 1, 1);
+	this.color0.set(1, 1, 1);
+	this.color1.set(1, 1, 1);
+
+	this.upVector.set(0, 1, 0);
+
+	this.colorBlend = 0;
+	this.colorCurve = [[0, 1], [1, 0]];
 
 	this.opacity = 1;
 	this.alpha = [[0, 0], [1, 1]];
@@ -662,7 +568,18 @@ Particle.prototype.joinSimulation = function (simParams, ratio) {
 	this.trailSprite = simD.trailsprite;
 	this.trailWidth = simD.trailwidth;
 	this.loopcount = simD.loopcount;
-	this.color.set(simD.color);
+
+	this.color1.seta(simD.color1);
+
+	this.color0.data[0] = simD.color0[0] *(1-simD.colorRandom)+simD.colorRandom*Math.random();
+	this.color0.data[1] = simD.color0[1] *(1-simD.colorRandom)+simD.colorRandom*Math.random();
+	this.color0.data[2] = simD.color0[2] *(1-simD.colorRandom)+simD.colorRandom*Math.random();
+
+	this.color.data[0] = this.color0[0];
+	this.color.data[1] = this.color0[1];
+	this.color.data[2] = this.color0[2];
+
+	this.colorCurve = simD.colorCurve;
 	this.opacity = randomBetween(simD.opacity[0], simD.opacity[1]);
 	this.alpha = simD.alpha;
 
@@ -718,10 +635,46 @@ Particle.prototype.setDataUsage = function () {
 };
 
 
+Particle.prototype.getInterpolatedInCurveAboveIndex = function(value, curve, index) {
+	return curve[index][1] + (value - curve[index][0]) / (curve[index+1][0] - curve[index][0])*(curve[index+1][1]-curve[index][1]);
+};
+
+Particle.prototype.valueFromCurve = function(value, curve) {
+	for (var i = 0; i < curve.length; i++) {
+		if (!curve[i+1]) return 0;
+		if (curve[i+1][0] > value) return this.getInterpolatedInCurveAboveIndex(value, curve, i)
+	}
+	return 0;
+};
+
+Particle.prototype.applyParticleCurves = function(deduct) {
+	this.size += this.growthFactor * this.valueFromCurve(this.progress, this.growth) * deduct;
+	this.rotation += this.spinspeed * this.valueFromCurve(this.progress, this.spin) * deduct;
+	this.color.data[3] = this.opacity * this.valueFromCurve(this.progress, this.alpha);
+
+	this.colorBlend = this.valueFromCurve(this.progress, this.colorCurve);
+	this.color.data[0] = this.color0.data[0]*this.colorBlend + this.color1.data[0]*(1-this.colorBlend);
+	this.color.data[1] = this.color0.data[1]*this.colorBlend + this.color1.data[1]*(1-this.colorBlend);
+	this.color.data[2] = this.color0.data[2]*this.colorBlend + this.color1.data[2]*(1-this.colorBlend);
+};
+
+Particle.prototype.defaultParticleUpdate = function(deduct) {
+	this.progress = 1-((this.lifeSpan - this.frameOffset*0.016)  / this.lifeSpanTotal);
+
+	this.applyParticleCurves(deduct);
+
+	this.velocity.muld(this.acceleration, this.acceleration, this.acceleration);
+	this.velocity.add_d(this.upVector.x*this.gravity*deduct, this.upVector.y*this.gravity*deduct, this.upVector.z*this.gravity*deduct);
+
+	this.calcVec.set(this.velocity);
+	this.calcVec.muld(deduct, deduct, deduct);
+	this.position.addv(this.calcVec);
+};
+
+
 Particle.prototype.killParticle = function () {
 	this.requestKill = true;
 };
-
 
 function TrailRenderer() {
 	this.settings = null;
@@ -732,7 +685,7 @@ function TrailRenderer() {
 	this.sprites = {};
 	this.trailDatas = [];
 	this.facingMode = 'Billboard'; //'Tangent'
-	// 	this.updateMode = 'Step'; //'Interpolate'
+	// 		this.updateMode = 'Step'; //'Interpolate'
 	this.updateMode = 'Interpolate'; //'Step'
 }
 
@@ -838,8 +791,6 @@ TrailRenderer.prototype.init = function(goo, simConf, settings, spriteAtlas, tex
 	};
 
 
-
-
 	var material = new Material(particleTrailShader);
 	material.uniforms.alphakill = simConf.alphakill.value;
 	material.blendState.blending = simConf.blending.value;
@@ -934,60 +885,105 @@ TrailRenderer.prototype.setTrailFront = function(trailData, position, tangent, t
 
 TrailRenderer.prototype.updateTrail = function(trailData, particle, camPos, index) {
 
-
-	var trailSegmentDatas = trailData.trailSegmentDatas;
-
 	if (trailData.invalid || this.facingMode == 'Billboard') {
-		if (this.updateMode == 'Step') {
-			this.updateStep(trailData, particle, camPos, index);
-		} else {
-			this.updateInterpolate(trailData, particle, camPos, index);
-		}
+		this.updateInterpolate(trailData, particle, camPos, index);
 		trailData.invalid = false;
 	}
 };
 
 
 
-TrailRenderer.prototype.updateStep = function(trailData, particle, camPos, index) {
-	var trailSegmentDatas = trailData.trailSegmentDatas;
 
-	var pos = this.meshData.getAttributeBuffer(MeshData.POSITION);
-	var col = this.meshData.getAttributeBuffer(MeshData.COLOR);
-
-	for (var i = 0; i < this.segmentCount; i++) {
-		var trailSegmentData = trailSegmentDatas[i];
-		var trailVector = trailSegmentData.position;
-
-		if (this.facingMode == 'Billboard') {
-			if (i === 0) {
-				trailDirection.set(trailSegmentDatas[i + 1].position).subv(trailVector);
-			} else if (i === this.segmentCount - 1) {
-				trailDirection.set(trailVector).subv(trailSegmentDatas[i - 1].position);
-			} else {
-				trailDirection.set(trailSegmentDatas[i + 1].position)
-					.subv(trailSegmentDatas[i - 1].position);
-			}
-
-			trailCamVec.set(trailVector).subv(camPos);
-			trailDirection.cross(trailCamVec);
-			trailDirection.normalize().mul(trailData.width * particle.size);
-		} else if (trailSegmentData.tangent != null) {
-			trailDirection.set(trailSegmentData.tangent).mul(trailData.width * particle.size);
-		} else {
-			trailDirection.set(trailData.width * particle.size, 0, 0);
-		}
-
-		pos[(index * this.segmentCount * 6) + 6 * i + 0] = trailVector.x - trailDirection.x;
-		pos[(index * this.segmentCount * 6) + 6 * i + 1] = trailVector.y - trailDirection.y;
-		pos[(index * this.segmentCount * 6) + 6 * i + 2] = trailVector.z - trailDirection.z;
-
-		pos[(index * this.segmentCount * 6) + 6 * i + 3] = trailVector.x + trailDirection.x;
-		pos[(index * this.segmentCount * 6) + 6 * i + 4] = trailVector.y + trailDirection.y;
-		pos[(index * this.segmentCount * 6) + 6 * i + 5] = trailVector.z + trailDirection.z;
-
-		col[(index * this.segmentCount * 8) + 8 * i + 3] = particle.color.data[3];
+TrailRenderer.prototype.updateBillboard = function(i, trailSegmentData, trailSegmentDatas, trailVector, camPos, w) {
+	if (i === 0) {
+		trailDirection.setv(trailSegmentDatas[i + 1].interpolatedPosition).subv(trailVector);
+	} else if (i === this.segmentCount - 1) {
+		trailDirection.setv(trailVector).subv(trailSegmentDatas[i - 1].interpolatedPosition);
+	} else {
+		trailDirection.setv(trailSegmentDatas[i + 1].interpolatedPosition)
+			.subv(trailSegmentDatas[i - 1].interpolatedPosition);
 	}
+
+	trailCamVec.setv(trailVector).subv(camPos);
+
+	// trailDirection.cross(trailCamVec);
+	var ldata = trailDirection.data;
+	var rdata = trailCamVec.data;
+	var x = rdata[2] * ldata[1] - rdata[1] * ldata[2];
+	var y = rdata[0] * ldata[2] - rdata[2] * ldata[0];
+	var z = rdata[1] * ldata[0] - rdata[0] * ldata[1];
+
+	// trailDirection.normalize().muld(w, w, w);
+	var l = Math.sqrt(x * x + y * y + z * z); //this.length();
+
+	if (l < 0.0000001) {
+		x = 0;
+		y = 0;
+		z = 0;
+	} else {
+		l = 1.0 / l;
+		x *= l * w;
+		y *= l * w;
+		z *= l * w;
+	}
+
+	trailDirection.data[0] = x;
+	trailDirection.data[1] = y;
+	trailDirection.data[2] = z;
+};
+
+TrailRenderer.prototype.updateTrailDirection = function(i, trailSegmentData, trailSegmentDatas, trailVector, camPos, w) {
+	if (this.facingMode == 'Billboard') {
+		this.updateBillboard(i, trailSegmentData, trailSegmentDatas, trailVector, camPos, w)
+	} else if (trailSegmentData.tangent !== null) {
+		trailDirection.setv(trailSegmentData.tangent).muld(w, w, w);
+	} else {
+		trailDirection.setd(w, 0, 0);
+	}
+};
+
+
+TrailRenderer.prototype.updateInterpolationVectors = function(i, trailSegmentDatas, trailData) {
+
+	var trailSegmentData = trailSegmentDatas[i];
+	var interpolationVector = trailSegmentData.interpolatedPosition;
+
+	interpolationVector.setv(trailSegmentData.position);
+
+	if (i > 0) {
+		interpolationVector.lerp(trailSegmentDatas[i - 1].position, trailData.throttle);
+	}
+};
+
+TrailRenderer.prototype.updateBufferData = function(index, i, tile, pos, col, trailVector, coldata, particle) {
+	tile[(index * this.segmentCount * 8)+ i * 8 + 0] = particle.trailOffsetX; //offset u
+	tile[(index * this.segmentCount * 8)+ i * 8 + 1] = particle.trailOffsetY; //offset w
+	tile[(index * this.segmentCount * 8)+ i * 8 + 2] = this.scaleX; //scale u
+	tile[(index * this.segmentCount * 8)+ i * 8 + 3] = this.scaleY; //scale w
+	tile[(index * this.segmentCount * 8)+ i * 8 + 4] = particle.trailOffsetX; //offset u
+	tile[(index * this.segmentCount * 8)+ i * 8 + 5] = particle.trailOffsetY; //offset w
+	tile[(index * this.segmentCount * 8)+ i * 8 + 6] = this.scaleX; //scale u
+	tile[(index * this.segmentCount * 8)+ i * 8 + 7] = this.scaleY; //scale w
+
+
+	pos[(index * this.segmentCount * 6) + 6 * i + 0] = trailVector.data[0] - trailDirection.data[0];
+	pos[(index * this.segmentCount * 6) + 6 * i + 1] = trailVector.data[1] - trailDirection.data[1];
+	pos[(index * this.segmentCount * 6) + 6 * i + 2] = trailVector.data[2] - trailDirection.data[2];
+
+	pos[(index * this.segmentCount * 6) + 6 * i + 3] = trailVector.data[0] + trailDirection.data[0];
+	pos[(index * this.segmentCount * 6) + 6 * i + 4] = trailVector.data[1] + trailDirection.data[1];
+	pos[(index * this.segmentCount * 6) + 6 * i + 5] = trailVector.data[2] + trailDirection.data[2];
+
+	col[(index * this.segmentCount * 8) + 8 * i + 0] = coldata[0];
+	col[(index * this.segmentCount * 8) + 8 * i + 1] = coldata[1];
+	col[(index * this.segmentCount * 8) + 8 * i + 2] = coldata[2];
+	col[(index * this.segmentCount * 8) + 8 * i + 4] = coldata[0];
+	col[(index * this.segmentCount * 8) + 8 * i + 5] = coldata[1];
+	col[(index * this.segmentCount * 8) + 8 * i + 6] = coldata[2];
+
+	var alpha = particle.color.data[3] * (this.segmentCount - i) / this.segmentCount; //   i === 0 || i === this.segmentCount - 1 ? 0 : particle.color.data[3];
+	col[(index * this.segmentCount * 8) + 8 * i + 3] = alpha;
+	col[(index * this.segmentCount * 8) + 8 * i + 7] = alpha;
 };
 
 TrailRenderer.prototype.updateInterpolate = function(trailData, particle, camPos, index) {
@@ -997,96 +993,20 @@ TrailRenderer.prototype.updateInterpolate = function(trailData, particle, camPos
 	var col = this.meshData.getAttributeBuffer(MeshData.COLOR);
 	var tile = this.meshData.getAttributeBuffer('TILE');
 
+	var coldata = particle.color.data;
+	var w = particle.size * particle.trailWidth;
+
 	for (var i = 0; i < this.segmentCount; i++) {
-		var trailSegmentData = trailSegmentDatas[i];
-		var interpolationVector = trailSegmentData.interpolatedPosition;
-
-		interpolationVector.setv(trailSegmentData.position);
-
-		if (i > 0) {
-			interpolationVector.lerp(trailSegmentDatas[i - 1].position, trailData.throttle);
-		}
+		this.updateInterpolationVectors(i, trailSegmentDatas, trailData);
 	}
 
 
-
-	var coldata = particle.color.data;
-	var w = particle.size * particle.trailWidth;
 	for (var i = 0; i < this.segmentCount; i++) {
+
 		var trailSegmentData = trailSegmentDatas[i];
 		var trailVector = trailSegmentData.interpolatedPosition;
-
-		if (this.facingMode == 'Billboard') {
-			if (i === 0) {
-				trailDirection.setv(trailSegmentDatas[i + 1].interpolatedPosition).subv(trailVector);
-			} else if (i === this.segmentCount - 1) {
-				trailDirection.setv(trailVector).subv(trailSegmentDatas[i - 1].interpolatedPosition);
-			} else {
-				trailDirection.setv(trailSegmentDatas[i + 1].interpolatedPosition)
-					.subv(trailSegmentDatas[i - 1].interpolatedPosition);
-			}
-
-			trailCamVec.setv(trailVector).subv(camPos);
-
-			// trailDirection.cross(trailCamVec);
-			var ldata = trailDirection.data;
-			var rdata = trailCamVec.data;
-			var x = rdata[2] * ldata[1] - rdata[1] * ldata[2];
-			var y = rdata[0] * ldata[2] - rdata[2] * ldata[0];
-			var z = rdata[1] * ldata[0] - rdata[0] * ldata[1];
-
-			// trailDirection.normalize().muld(w, w, w);
-			var l = Math.sqrt(x * x + y * y + z * z); //this.length();
-
-			if (l < 0.0000001) {
-				x = 0;
-				y = 0;
-				z = 0;
-			} else {
-				l = 1.0 / l;
-				x *= l * w;
-				y *= l * w;
-				z *= l * w;
-			}
-
-			trailDirection.data[0] = x;
-			trailDirection.data[1] = y;
-			trailDirection.data[2] = z;
-		} else if (trailSegmentData.tangent !== null) {
-			trailDirection.setv(trailSegmentData.tangent).muld(w, w, w);
-		} else {
-			trailDirection.setd(w, 0, 0);
-		}
-
-
-		tile[(index * this.segmentCount * 8)+ i * 8 + 0] = particle.trailOffsetX; //offset u
-		tile[(index * this.segmentCount * 8)+ i * 8 + 1] = particle.trailOffsetY; //offset w
-		tile[(index * this.segmentCount * 8)+ i * 8 + 2] = this.scaleX; //scale u
-		tile[(index * this.segmentCount * 8)+ i * 8 + 3] = this.scaleY; //scale w
-		tile[(index * this.segmentCount * 8)+ i * 8 + 4] = particle.trailOffsetX; //offset u
-		tile[(index * this.segmentCount * 8)+ i * 8 + 5] = particle.trailOffsetY; //offset w
-		tile[(index * this.segmentCount * 8)+ i * 8 + 6] = this.scaleX; //scale u
-		tile[(index * this.segmentCount * 8)+ i * 8 + 7] = this.scaleY; //scale w
-
-
-		pos[(index * this.segmentCount * 6) + 6 * i + 0] = trailVector.data[0] - trailDirection.data[0];
-		pos[(index * this.segmentCount * 6) + 6 * i + 1] = trailVector.data[1] - trailDirection.data[1];
-		pos[(index * this.segmentCount * 6) + 6 * i + 2] = trailVector.data[2] - trailDirection.data[2];
-
-		pos[(index * this.segmentCount * 6) + 6 * i + 3] = trailVector.data[0] + trailDirection.data[0];
-		pos[(index * this.segmentCount * 6) + 6 * i + 4] = trailVector.data[1] + trailDirection.data[1];
-		pos[(index * this.segmentCount * 6) + 6 * i + 5] = trailVector.data[2] + trailDirection.data[2];
-
-		col[(index * this.segmentCount * 8) + 8 * i + 0] = coldata[0];
-		col[(index * this.segmentCount * 8) + 8 * i + 1] = coldata[1];
-		col[(index * this.segmentCount * 8) + 8 * i + 2] = coldata[2];
-		col[(index * this.segmentCount * 8) + 8 * i + 4] = coldata[0];
-		col[(index * this.segmentCount * 8) + 8 * i + 5] = coldata[1];
-		col[(index * this.segmentCount * 8) + 8 * i + 6] = coldata[2];
-
-		var alpha = i === 0 || i === this.segmentCount - 1 ? 0 : particle.color.data[3];
-		col[(index * this.segmentCount * 8) + 8 * i + 3] = alpha;
-		col[(index * this.segmentCount * 8) + 8 * i + 7] = alpha;
+		this.updateTrailDirection(i, trailSegmentData, trailSegmentDatas, trailVector, camPos, w);
+		this.updateBufferData(index, i, tile, pos, col, trailVector, coldata, particle);
 	}
 };
 
@@ -1101,6 +1021,7 @@ TrailRenderer.prototype.rebuild = function() {
 };
 
 TrailRenderer.prototype.remove = function() {
+	console.log("Remove Trail Renderer entity", this.entity)
 	this.entity.removeFromWorld();
 };
 
@@ -1140,8 +1061,6 @@ TrailRenderer.prototype.updateMeshdata = function() {
 	this.lastAlive = 0;
 	this.renderedCount = 0;
 };
-
-
 
 function ParticleRenderer() {
 	this.settings = null;
@@ -1306,6 +1225,7 @@ ParticleRenderer.prototype.rebuild = function () {
 };
 
 ParticleRenderer.prototype.remove = function () {
+	console.log("Remove Billboard Renderer entity", this.entity)
 	this.entity.removeFromWorld();
 };
 
@@ -1353,16 +1273,7 @@ ParticleRenderer.prototype.initFrame = function () {
 
 };
 
-ParticleRenderer.prototype.updateParticle = function (tpf, particle) {
-	if (!this.renderedCount) {
-		this.initFrame();
-	}
-	this.renderedCount++;
-
-
-	if (particle.dead) {
-		return;
-	}
+ParticleRenderer.prototype.updateParticleBufferData = function (tpf, particle) {
 	var j, i, l;
 	i = this.renderedCount;
 
@@ -1396,7 +1307,20 @@ ParticleRenderer.prototype.updateParticle = function (tpf, particle) {
 	}
 
 	this.lastAlive = i + 1;
+};
 
+ParticleRenderer.prototype.updateParticle = function (tpf, particle) {
+	if (!this.renderedCount) {
+		this.initFrame();
+	}
+
+	this.renderedCount++;
+
+	if (particle.dead) {
+		return;
+	}
+
+	this.updateParticleBufferData(tpf, particle);
 };
 
 ParticleRenderer.prototype.updateMeshdata = function () {
@@ -1411,6 +1335,7 @@ ParticleRenderer.prototype.updateMeshdata = function () {
 };
 
 
+
 var DefaultSpriteAtlas = {
 	"atlases":[
 		{
@@ -1422,6 +1347,70 @@ var DefaultSpriteAtlas = {
 				"tilesY":8
 			},
 			"sprites":[
+				{
+					"id":"0_0",
+					"tiles":[[0, 0]]
+				},
+				{
+					"id":"0_1",
+					"tiles":[[0, 1]]
+				},
+				{
+					"id":"0_2",
+					"tiles":[[0, 2]]
+				},
+				{
+					"id":"0_3",
+					"tiles":[[0, 3]]
+				},
+				{
+					"id":"0_4",
+					"tiles":[[0, 4]]
+				},
+				{
+					"id":"0_5",
+					"tiles":[[0, 5]]
+				},
+				{
+					"id":"0_6",
+					"tiles":[[0, 6]]
+				},
+				{
+					"id":"0_7",
+					"tiles":[[0, 7]]
+				},
+				{
+					"id":"1_0",
+					"tiles":[[1, 0]]
+				},
+				{
+					"id":"1_1",
+					"tiles":[[1, 1]]
+				},
+				{
+					"id":"1_2",
+					"tiles":[[1, 2]]
+				},
+				{
+					"id":"1_3",
+					"tiles":[[1, 3]]
+				},
+				{
+					"id":"1_4",
+					"tiles":[[1, 4]]
+				},
+				{
+					"id":"1_5",
+					"tiles":[[1, 5]]
+				},
+				{
+					"id":"1_6",
+					"tiles":[[1, 6]]
+				},
+				{
+					"id":"1_7",
+					"tiles":[[1, 7]]
+				},
 				{
 					"id":"dot",
 					"tiles":[[2, 4]]
@@ -1524,7 +1513,7 @@ DefaultSimulators = {
 				"ParticleRenderer",
 				"TrailRenderer"
 			],
-			"poolCount": 1000,
+			"poolCount": 300,
 			"blending": {
 				"value": "AdditiveBlending",
 				"type": "option",
@@ -1545,7 +1534,7 @@ DefaultSimulators = {
 			"renderers": [
 				"ParticleRenderer"
 			],
-			"poolCount": 1000,
+			"poolCount": 400,
 			"blending": {
 				"value": "AdditiveBlending",
 				"type": "option",
@@ -1566,7 +1555,7 @@ DefaultSimulators = {
 			"renderers": [
 				"ParticleRenderer"
 			],
-			"poolCount": 2000,
+			"poolCount": 400,
 			"blending": {
 				"value": "CustomBlending",
 				"type": "option",
@@ -1587,7 +1576,7 @@ DefaultSimulators = {
 			"renderers": [
 				"FastTrailRenderer"
 			],
-			"poolCount": 400,
+			"poolCount": 200,
 			"blending": {
 				"value": "AdditiveBlending",
 				"type": "option",
@@ -1609,9 +1598,26 @@ var DefaultSimulationParams = {
 	"id": "defaultConfig",
 	"particle_params":[
 		{
-			"param":"color",
-			"value": [0.6, 0.7, 1, 1],
+			"param":"color0",
+			"value": [0.4, 0.7, 1, 1],
 			"type": "color"
+		},
+		{
+			"param":"color1",
+			"value": [0.8, 0.2, 0, 1],
+			"type": "color"
+		},
+		{
+			"param":"colorCurve",
+			"value": "oneToZero",
+			"type": "curve",
+			"values":   ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"],
+			"texts":    ["zeroToOne", "oneToZero", "zeroOneZero", "oneZeroOne", "growShrink"]
+		},
+		{
+			"param":"colorRandom",
+			"value": 0,
+			"type": "number"
 		},
 		{
 			"param":"count",

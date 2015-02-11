@@ -99,6 +99,7 @@ function (
 
 
 	ParticleSimulator.prototype.remove = function () {
+
 		for (var i = 0; i < this.renderers.length; i++) {
 			if (this.renderers[i].remove) {
 				this.renderers[i].remove();

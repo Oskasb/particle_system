@@ -31,10 +31,21 @@ function (
 		return this.simulators[id];
 	};
 
-	ParticleSystem.prototype.remove = function (id) {
+	ParticleSystem.prototype.removeParticleSystemId = function(id) {
 		if (this.simulators[id]) {
 			this.simulators[id].remove();
 			delete this.simulators[id];
+		}
+	};
+
+	ParticleSystem.prototype.remove = function (id) {
+
+		if (!id) {
+			for (var key in this.simulators) {
+				this.removeParticleSystemId(key);
+			}
+		} else {
+			this.removeParticleSystemId(id);
 		}
 	};
 

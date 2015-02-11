@@ -19,15 +19,19 @@ define([
 		};
 
 		ParticlesAPI.prototype.spawnParticles = function(id, position, normal, effectData, callbacks) {
-			this.particleSystem.spawnParticleSimulation(id, position, normal, effectData, callbacks)
+			this.particleSystem.spawnParticleSimulation(id, position, normal, effectData, callbacks);
 		};
 
 		ParticlesAPI.prototype.createParticleSystems = function(systemConfigs, rendererConfigs, atlasConfig, texture) {
-			this.particleSystem.addConfiguredAtlasSystems(systemConfigs, rendererConfigs, atlasConfig, texture)
+			this.particleSystem.addConfiguredAtlasSystems(systemConfigs, rendererConfigs, atlasConfig, texture);
 		};
 
 		ParticlesAPI.prototype.removeParticleSystem = function(id) {
-			this.particleSystem.remove(id)
+			this.particleSystem.remove(id);
+		};
+
+		ParticlesAPI.prototype.cleanupParticleSystems = function() {
+			this.particleSystem.remove();
 		};
 
 		return ParticlesAPI

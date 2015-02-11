@@ -95,7 +95,7 @@ define([
 		particle.lifeSpan -= deduct;
 
 		if (this.particleUpdate) {
-			this.particleUpdate(particle);
+			this.particleUpdate(particle, deduct);
 		} else {
 			particle.defaultParticleUpdate(deduct);
 		}

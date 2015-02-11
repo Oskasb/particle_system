@@ -11,6 +11,7 @@ function (
 
 	function Particle(idx) {
 		this.calcVec = new Vector3();
+		this.upVector = new Vector3();
 		this.index = idx;
 		this.position 	= new Vector3();
 		this.direction  = new Vector3();
@@ -31,6 +32,9 @@ function (
 		this.color.set(1, 1, 1, 1);
 		this.color0.set(1, 1, 1);
 		this.color1.set(1, 1, 1);
+
+		this.upVector.set(0, 1, 0);
+
 		this.colorBlend = 0;
 		this.colorCurve = [[0, 1], [1, 0]];
 
@@ -183,7 +187,7 @@ function (
 		this.applyParticleCurves(deduct);
 
 		this.velocity.muld(this.acceleration, this.acceleration, this.acceleration);
-		this.velocity.add_d(0, this.gravity*deduct, 0);
+		this.velocity.add_d(this.upVector.x*this.gravity*deduct, this.upVector.y*this.gravity*deduct, this.upVector.z*this.gravity*deduct);
 
 		this.calcVec.set(this.velocity);
 		this.calcVec.muld(deduct, deduct, deduct);
