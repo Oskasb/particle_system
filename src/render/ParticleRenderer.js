@@ -51,22 +51,6 @@ function (
 		entity.meshRendererComponent.cullMode = 'Never';
 		entity.addToWorld();
 
-		/*
-		entity.skip = true;
-		var textureCreator = new TextureCreator();
-
-
-
-		var texture = textureCreator.loadTexture2D(this.atlasConf.textureUrl.value, {
-			magFilter:"NearestNeighbor",
-			minFilter:"NearestNeighborNoMipMaps",
-			wrapS: 'EdgeClamp',
-			wrapT: 'EdgeClamp'
-		}, function() {
-			entity.skip = false;
-		});
-
-		*/
 		material.setTexture('PARTICLE_MAP', texture);
 
 		var offset = this.meshData.getAttributeBuffer('OFFSET');
