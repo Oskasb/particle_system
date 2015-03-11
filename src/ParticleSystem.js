@@ -23,8 +23,8 @@ function (
 		}
 	};
 
-	ParticleSystem.prototype.spawnParticleSimulation = function(id, position, normal, effectData, callbacks) {
-		this.simulators[id].addEffectSimulation(position, normal, effectData, callbacks)
+	ParticleSystem.prototype.spawnParticleSimulation = function(id, position, normal, effectData, callbacks, particleDensity) {
+		this.simulators[id].addEffectSimulation(position, normal, effectData, callbacks, particleDensity)
 	};
 
 	ParticleSystem.prototype.get = function (id) {

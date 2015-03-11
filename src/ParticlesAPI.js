@@ -18,8 +18,8 @@ define([
 			this.particleSystem.update(tpf);
 		};
 
-		ParticlesAPI.prototype.spawnParticles = function(id, position, normal, effectData, callbacks) {
-			this.particleSystem.spawnParticleSimulation(id, position, normal, effectData, callbacks);
+		ParticlesAPI.prototype.spawnParticles = function(id, position, normal, effectData, callbacks, particleDensity) {
+			this.particleSystem.spawnParticleSimulation(id, position, normal, effectData, callbacks, particleDensity);
 		};
 
 		ParticlesAPI.prototype.createParticleSystems = function(systemConfigs, rendererConfigs, atlasConfig, texture) {

@@ -26,9 +26,9 @@ define([
 		this.onParticleDead = null;
 	};
 
-	ParticleSimulation.prototype.initSimulation = function(posVec, normVec, defaultSettings, effectData) {
+	ParticleSimulation.prototype.initSimulation = function(posVec, normVec, defaultSettings, effectData, particleDensity) {
 		this.resetSimulation();
-		this.params = new SimulationParameters(new Vector3(posVec), new Vector3(normVec), DefaultSimulationParams.particle_params, effectData);;
+		this.params = new SimulationParameters(new Vector3(posVec), new Vector3(normVec), DefaultSimulationParams.particle_params, effectData, particleDensity);
 		this.active = true;
 	};
 

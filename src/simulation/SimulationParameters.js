@@ -19,13 +19,13 @@ define(function() {
 		"growShrink":   [[0, 1], [0.5,0], [1, -2]]
 	};
 
-	var SimulationParameters = function(position, normal, simParams, effectData) {
+	var SimulationParameters = function(position, normal, simParams, effectData, particleDensity) {
 		this.position = position;
 		this.normal = normal;
-		this.data = this.configureData(simParams, effectData);
+		this.data = this.configureData(simParams, effectData, particleDensity);
 	};
 
-	SimulationParameters.prototype.configureData = function(simParams, effectData) {
+	SimulationParameters.prototype.configureData = function(simParams, effectData, particleDensity) {
 		var data = {};
 
 		for (var i = 0; i < simParams.length; i++) {
@@ -46,7 +46,7 @@ define(function() {
 		}
 
 
-		data.effectCount = data.count;
+		data.effectCount = Math.ceil(data.count * particleDensity);
 		return data;
 	};
 
