@@ -205,7 +205,7 @@ function (
 	var particleShader = {
 		processors: [
 			function (shader, shaderInfo) {
-				shader.defines.BILLBOARD_TYPE = shaderInfo.xxx || 1;
+				shader.defines.BILLBOARD_TYPE = shaderInfo.xxx || 0;
 			}
 		],
 		defines: {
