@@ -39,7 +39,25 @@ function (
 		meshData.vertexData.setDataUsage('DynamicDraw');
 		this.meshData = meshData;
 
+		if (this.settings.billboardType) {
+			var bbt = this.settings.billboardType
+			particleShader.processors = [
+				function (shader, shaderInfo) {
+					shader.defines.BILLBOARD_TYPE = bbt;
+				}
+			]
+		} else {
+			particleShader.processors = [
+				function (shader, shaderInfo) {
+					shader.defines.BILLBOARD_TYPE = 0;
+				}
+			]
+		}
+
 		var material = new Material(particleShader);
+
+
+
 		material.uniforms.alphakill = simConf.alphakill.value;
 		material.blendState.blending = simConf.blending.value;
 

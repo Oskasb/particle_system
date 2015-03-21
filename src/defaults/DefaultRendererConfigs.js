@@ -3,7 +3,16 @@ define({
 		{
 			"id":"ParticleRenderer",
 			"script":"ParticleRenderer",
-			"settings": {}
+			"settings": {
+			}
+		},
+		{
+			"id":"SurfaceRenderer",
+			"script":"ParticleRenderer",
+			"settings": {
+				"billboardType":2,
+				"up":[0, 0, 1]
+			}
 		},
 		{
 			"id":"FastTrailRenderer",
@@ -31,39 +40,6 @@ define({
 				},
 				"updateSpeed": {
 					"value": 5,
-					"type": "number"
-				}
-			}
-		},
-		{
-			"id":"LineRenderer",
-			"script":"LineRenderer",
-			"settings": {
-				"width": {
-					"value": 0.1,
-					"type": "number",
-					"step": 0.01,
-					"decimals": 2
-				},
-				"distance": {
-					"value": 0.2,
-					"type": "number",
-					"step": 0.1
-				},
-				"limit": {
-					"value": 3,
-					"type": "number",
-					"step": 1,
-					"decimals": 0
-				}
-			}
-		},
-		{
-			"id":"TriangleRenderer",
-			"script":"TriangleRenderer",
-			"settings": {
-				"distance": {
-					"value": 0.2,
 					"type": "number"
 				}
 			}
